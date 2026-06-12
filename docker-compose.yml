@@ -1,0 +1,20 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: terrasignal-db
+    environment:
+      POSTGRES_USER: terrasignal
+      POSTGRES_PASSWORD: terrasignal_local_dev
+      POSTGRES_DB: terrasignal
+    ports:
+      - "5433:5432"
+    volumes:
+      - terrasignal_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U terrasignal -d terrasignal"]
+      interval: 2s
+      timeout: 3s
+      retries: 20
+
+volumes:
+  terrasignal_pgdata:

@@ -1,0 +1,2241 @@
+{
+  "components": {
+    "schemas": {
+      "AuditEventOut": {
+        "properties": {
+          "actor": {
+            "title": "Actor",
+            "type": "string"
+          },
+          "actor_role": {
+            "title": "Actor Role",
+            "type": "string"
+          },
+          "entity_id": {
+            "title": "Entity Id",
+            "type": "string"
+          },
+          "entity_type": {
+            "title": "Entity Type",
+            "type": "string"
+          },
+          "event_id": {
+            "format": "uuid",
+            "title": "Event Id",
+            "type": "string"
+          },
+          "event_type": {
+            "title": "Event Type",
+            "type": "string"
+          },
+          "occurred_at": {
+            "format": "date-time",
+            "title": "Occurred At",
+            "type": "string"
+          },
+          "payload": {
+            "additionalProperties": true,
+            "title": "Payload",
+            "type": "object"
+          },
+          "request_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Request Id"
+          }
+        },
+        "required": [
+          "event_id",
+          "occurred_at",
+          "actor",
+          "actor_role",
+          "event_type",
+          "entity_type",
+          "entity_id",
+          "request_id",
+          "payload"
+        ],
+        "title": "AuditEventOut",
+        "type": "object"
+      },
+      "CompOut": {
+        "properties": {
+          "comp_id": {
+            "title": "Comp Id",
+            "type": "string"
+          },
+          "free_rent_months": {
+            "title": "Free Rent Months",
+            "type": "integer"
+          },
+          "rent_psf": {
+            "title": "Rent Psf",
+            "type": "number"
+          },
+          "signed_date": {
+            "title": "Signed Date",
+            "type": "string"
+          },
+          "submarket": {
+            "title": "Submarket",
+            "type": "string"
+          },
+          "term_months": {
+            "title": "Term Months",
+            "type": "integer"
+          },
+          "ti_allowance_psf": {
+            "title": "Ti Allowance Psf",
+            "type": "number"
+          }
+        },
+        "required": [
+          "comp_id",
+          "submarket",
+          "signed_date",
+          "rent_psf",
+          "term_months",
+          "ti_allowance_psf",
+          "free_rent_months"
+        ],
+        "title": "CompOut",
+        "type": "object"
+      },
+      "DriftMetricOut": {
+        "properties": {
+          "baseline_window": {
+            "title": "Baseline Window",
+            "type": "string"
+          },
+          "computed_at": {
+            "format": "date-time",
+            "title": "Computed At",
+            "type": "string"
+          },
+          "current_window": {
+            "title": "Current Window",
+            "type": "string"
+          },
+          "feature_name": {
+            "title": "Feature Name",
+            "type": "string"
+          },
+          "model_name": {
+            "title": "Model Name",
+            "type": "string"
+          },
+          "psi": {
+            "title": "Psi",
+            "type": "number"
+          },
+          "status": {
+            "enum": [
+              "green",
+              "amber",
+              "red"
+            ],
+            "title": "Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "model_name",
+          "feature_name",
+          "psi",
+          "status",
+          "computed_at",
+          "baseline_window",
+          "current_window"
+        ],
+        "title": "DriftMetricOut",
+        "type": "object"
+      },
+      "ExpirationMonth": {
+        "properties": {
+          "annual_rent_expiring": {
+            "title": "Annual Rent Expiring",
+            "type": "number"
+          },
+          "leases_expiring": {
+            "title": "Leases Expiring",
+            "type": "integer"
+          },
+          "month": {
+            "format": "date",
+            "title": "Month",
+            "type": "string"
+          }
+        },
+        "required": [
+          "month",
+          "leases_expiring",
+          "annual_rent_expiring"
+        ],
+        "title": "ExpirationMonth",
+        "type": "object"
+      },
+      "FeedbackRequest": {
+        "properties": {
+          "action": {
+            "enum": [
+              "accept",
+              "override"
+            ],
+            "title": "Action",
+            "type": "string"
+          },
+          "comment": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Comment"
+          },
+          "override_value": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Override Value"
+          },
+          "prediction_id": {
+            "format": "uuid",
+            "title": "Prediction Id",
+            "type": "string"
+          },
+          "reason_code": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reason Code"
+          }
+        },
+        "required": [
+          "prediction_id",
+          "action"
+        ],
+        "title": "FeedbackRequest",
+        "type": "object"
+      },
+      "FeedbackResponse": {
+        "properties": {
+          "action": {
+            "title": "Action",
+            "type": "string"
+          },
+          "feedback_id": {
+            "format": "uuid",
+            "title": "Feedback Id",
+            "type": "string"
+          },
+          "prediction_id": {
+            "format": "uuid",
+            "title": "Prediction Id",
+            "type": "string"
+          },
+          "recorded_at": {
+            "format": "date-time",
+            "title": "Recorded At",
+            "type": "string"
+          }
+        },
+        "required": [
+          "feedback_id",
+          "prediction_id",
+          "action",
+          "recorded_at"
+        ],
+        "title": "FeedbackResponse",
+        "type": "object"
+      },
+      "HTTPValidationError": {
+        "properties": {
+          "detail": {
+            "items": {
+              "$ref": "#/components/schemas/ValidationError"
+            },
+            "title": "Detail",
+            "type": "array"
+          }
+        },
+        "title": "HTTPValidationError",
+        "type": "object"
+      },
+      "KillSwitchRequest": {
+        "properties": {
+          "baseline_mode": {
+            "title": "Baseline Mode",
+            "type": "boolean"
+          },
+          "reason": {
+            "title": "Reason",
+            "type": "string"
+          }
+        },
+        "required": [
+          "baseline_mode",
+          "reason"
+        ],
+        "title": "KillSwitchRequest",
+        "type": "object"
+      },
+      "KillSwitchState": {
+        "properties": {
+          "baseline_mode": {
+            "title": "Baseline Mode",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "baseline_mode"
+        ],
+        "title": "KillSwitchState",
+        "type": "object"
+      },
+      "LineageOut": {
+        "properties": {
+          "approved_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Approved At"
+          },
+          "approved_by": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Approved By"
+          },
+          "as_of": {
+            "format": "date",
+            "title": "As Of",
+            "type": "string"
+          },
+          "baseline_mode": {
+            "title": "Baseline Mode",
+            "type": "boolean"
+          },
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "dq_report_uri": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Dq Report Uri"
+          },
+          "entity_id": {
+            "title": "Entity Id",
+            "type": "string"
+          },
+          "entity_type": {
+            "title": "Entity Type",
+            "type": "string"
+          },
+          "eval_set_hash": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Eval Set Hash"
+          },
+          "features": {
+            "additionalProperties": {
+              "type": "number"
+            },
+            "title": "Features",
+            "type": "object"
+          },
+          "feedback": {
+            "items": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "title": "Feedback",
+            "type": "array"
+          },
+          "git_sha": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Git Sha"
+          },
+          "model_metrics": {
+            "anyOf": [
+              {
+                "additionalProperties": {
+                  "type": "number"
+                },
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Model Metrics"
+          },
+          "model_name": {
+            "title": "Model Name",
+            "type": "string"
+          },
+          "model_version": {
+            "title": "Model Version",
+            "type": "integer"
+          },
+          "output": {
+            "additionalProperties": true,
+            "title": "Output",
+            "type": "object"
+          },
+          "prediction_id": {
+            "format": "uuid",
+            "title": "Prediction Id",
+            "type": "string"
+          },
+          "training_snapshot_uri": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Training Snapshot Uri"
+          }
+        },
+        "required": [
+          "prediction_id",
+          "created_at",
+          "model_name",
+          "model_version",
+          "entity_type",
+          "entity_id",
+          "as_of",
+          "baseline_mode",
+          "features",
+          "output",
+          "training_snapshot_uri",
+          "dq_report_uri",
+          "git_sha",
+          "eval_set_hash",
+          "model_metrics",
+          "approved_by",
+          "approved_at",
+          "feedback"
+        ],
+        "title": "LineageOut",
+        "type": "object"
+      },
+      "LoginRequest": {
+        "properties": {
+          "password": {
+            "title": "Password",
+            "type": "string"
+          },
+          "username": {
+            "title": "Username",
+            "type": "string"
+          }
+        },
+        "required": [
+          "username",
+          "password"
+        ],
+        "title": "LoginRequest",
+        "type": "object"
+      },
+      "LoginResponse": {
+        "properties": {
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "role": {
+            "title": "Role",
+            "type": "string"
+          },
+          "token": {
+            "title": "Token",
+            "type": "string"
+          },
+          "username": {
+            "title": "Username",
+            "type": "string"
+          }
+        },
+        "required": [
+          "token",
+          "username",
+          "role",
+          "name"
+        ],
+        "title": "LoginResponse",
+        "type": "object"
+      },
+      "ModelVersionOut": {
+        "properties": {
+          "approved_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Approved At"
+          },
+          "approved_by": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Approved By"
+          },
+          "baseline_metrics": {
+            "additionalProperties": {
+              "additionalProperties": {
+                "type": "number"
+              },
+              "type": "object"
+            },
+            "title": "Baseline Metrics",
+            "type": "object"
+          },
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "dq_report_uri": {
+            "title": "Dq Report Uri",
+            "type": "string"
+          },
+          "eval_set_hash": {
+            "title": "Eval Set Hash",
+            "type": "string"
+          },
+          "git_sha": {
+            "title": "Git Sha",
+            "type": "string"
+          },
+          "metrics": {
+            "additionalProperties": {
+              "type": "number"
+            },
+            "title": "Metrics",
+            "type": "object"
+          },
+          "model_card_path": {
+            "title": "Model Card Path",
+            "type": "string"
+          },
+          "model_name": {
+            "title": "Model Name",
+            "type": "string"
+          },
+          "status": {
+            "title": "Status",
+            "type": "string"
+          },
+          "training_snapshot_uri": {
+            "title": "Training Snapshot Uri",
+            "type": "string"
+          },
+          "version": {
+            "title": "Version",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "model_name",
+          "version",
+          "status",
+          "created_at",
+          "metrics",
+          "baseline_metrics",
+          "eval_set_hash",
+          "training_snapshot_uri",
+          "dq_report_uri",
+          "git_sha",
+          "model_card_path",
+          "approved_by",
+          "approved_at"
+        ],
+        "title": "ModelVersionOut",
+        "type": "object"
+      },
+      "PaymentRow": {
+        "properties": {
+          "amount_due": {
+            "title": "Amount Due",
+            "type": "number"
+          },
+          "amount_paid": {
+            "title": "Amount Paid",
+            "type": "number"
+          },
+          "days_late": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Days Late"
+          },
+          "due_date": {
+            "format": "date",
+            "title": "Due Date",
+            "type": "string"
+          },
+          "lease_id": {
+            "title": "Lease Id",
+            "type": "string"
+          },
+          "paid_date": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Paid Date"
+          }
+        },
+        "required": [
+          "due_date",
+          "paid_date",
+          "amount_due",
+          "amount_paid",
+          "days_late",
+          "lease_id"
+        ],
+        "title": "PaymentRow",
+        "type": "object"
+      },
+      "PortfolioSummary": {
+        "properties": {
+          "active_leases": {
+            "title": "Active Leases",
+            "type": "integer"
+          },
+          "as_of": {
+            "format": "date",
+            "title": "As Of",
+            "type": "string"
+          },
+          "avg_pd": {
+            "title": "Avg Pd",
+            "type": "number"
+          },
+          "expiration_wall": {
+            "items": {
+              "$ref": "#/components/schemas/ExpirationMonth"
+            },
+            "title": "Expiration Wall",
+            "type": "array"
+          },
+          "n_properties": {
+            "title": "N Properties",
+            "type": "integer"
+          },
+          "n_units": {
+            "title": "N Units",
+            "type": "integer"
+          },
+          "noi_at_risk_annual": {
+            "title": "Noi At Risk Annual",
+            "type": "number"
+          },
+          "renewal_upside_annual": {
+            "title": "Renewal Upside Annual",
+            "type": "number"
+          },
+          "risk_histogram": {
+            "items": {
+              "additionalProperties": {
+                "type": "number"
+              },
+              "type": "object"
+            },
+            "title": "Risk Histogram",
+            "type": "array"
+          },
+          "total_rsf": {
+            "title": "Total Rsf",
+            "type": "integer"
+          },
+          "watchlist_count": {
+            "title": "Watchlist Count",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "as_of",
+          "n_properties",
+          "n_units",
+          "total_rsf",
+          "active_leases",
+          "noi_at_risk_annual",
+          "watchlist_count",
+          "avg_pd",
+          "risk_histogram",
+          "expiration_wall",
+          "renewal_upside_annual"
+        ],
+        "title": "PortfolioSummary",
+        "type": "object"
+      },
+      "RationaleResponse": {
+        "properties": {
+          "backend": {
+            "title": "Backend",
+            "type": "string"
+          },
+          "fallback_used": {
+            "title": "Fallback Used",
+            "type": "boolean"
+          },
+          "guard_passed": {
+            "title": "Guard Passed",
+            "type": "boolean"
+          },
+          "label": {
+            "default": "AI-generated explanation",
+            "title": "Label",
+            "type": "string"
+          },
+          "memo": {
+            "title": "Memo",
+            "type": "string"
+          },
+          "payload_hash": {
+            "title": "Payload Hash",
+            "type": "string"
+          },
+          "prediction_id": {
+            "format": "uuid",
+            "title": "Prediction Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "prediction_id",
+          "memo",
+          "backend",
+          "payload_hash",
+          "guard_passed",
+          "fallback_used"
+        ],
+        "title": "RationaleResponse",
+        "type": "object"
+      },
+      "RentForecastRequest": {
+        "properties": {
+          "unit_id": {
+            "title": "Unit Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "unit_id"
+        ],
+        "title": "RentForecastRequest",
+        "type": "object"
+      },
+      "RentForecastResponse": {
+        "properties": {
+          "as_of": {
+            "format": "date",
+            "title": "As Of",
+            "type": "string"
+          },
+          "asset_class": {
+            "title": "Asset Class",
+            "type": "string"
+          },
+          "baseline_mode": {
+            "title": "Baseline Mode",
+            "type": "boolean"
+          },
+          "comp_median_rent_6m": {
+            "title": "Comp Median Rent 6M",
+            "type": "number"
+          },
+          "comps": {
+            "items": {
+              "$ref": "#/components/schemas/CompOut"
+            },
+            "title": "Comps",
+            "type": "array"
+          },
+          "current_rent_psf": {
+            "title": "Current Rent Psf",
+            "type": "number"
+          },
+          "current_tenant_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Current Tenant Id"
+          },
+          "drivers": {
+            "items": {
+              "$ref": "#/components/schemas/ShapDriverOut"
+            },
+            "title": "Drivers",
+            "type": "array"
+          },
+          "lease_expiration": {
+            "format": "date",
+            "title": "Lease Expiration",
+            "type": "string"
+          },
+          "model_version": {
+            "title": "Model Version",
+            "type": "integer"
+          },
+          "p10": {
+            "title": "P10",
+            "type": "number"
+          },
+          "p50": {
+            "title": "P50",
+            "type": "number"
+          },
+          "p90": {
+            "title": "P90",
+            "type": "number"
+          },
+          "prediction_id": {
+            "format": "uuid",
+            "title": "Prediction Id",
+            "type": "string"
+          },
+          "property_name": {
+            "title": "Property Name",
+            "type": "string"
+          },
+          "submarket": {
+            "title": "Submarket",
+            "type": "string"
+          },
+          "unit_id": {
+            "title": "Unit Id",
+            "type": "string"
+          },
+          "unit_rsf": {
+            "title": "Unit Rsf",
+            "type": "number"
+          }
+        },
+        "required": [
+          "prediction_id",
+          "unit_id",
+          "property_name",
+          "submarket",
+          "asset_class",
+          "unit_rsf",
+          "p10",
+          "p50",
+          "p90",
+          "current_rent_psf",
+          "comp_median_rent_6m",
+          "lease_expiration",
+          "current_tenant_id",
+          "as_of",
+          "model_version",
+          "baseline_mode",
+          "drivers",
+          "comps"
+        ],
+        "title": "RentForecastResponse",
+        "type": "object"
+      },
+      "RentQueueItem": {
+        "properties": {
+          "asset_class": {
+            "title": "Asset Class",
+            "type": "string"
+          },
+          "baseline_mode": {
+            "title": "Baseline Mode",
+            "type": "boolean"
+          },
+          "current_rent_psf": {
+            "title": "Current Rent Psf",
+            "type": "number"
+          },
+          "floor": {
+            "title": "Floor",
+            "type": "integer"
+          },
+          "lease_expiration": {
+            "format": "date",
+            "title": "Lease Expiration",
+            "type": "string"
+          },
+          "market": {
+            "title": "Market",
+            "type": "string"
+          },
+          "p10": {
+            "title": "P10",
+            "type": "number"
+          },
+          "p50": {
+            "title": "P50",
+            "type": "number"
+          },
+          "p90": {
+            "title": "P90",
+            "type": "number"
+          },
+          "prediction_id": {
+            "format": "uuid",
+            "title": "Prediction Id",
+            "type": "string"
+          },
+          "property_name": {
+            "title": "Property Name",
+            "type": "string"
+          },
+          "submarket": {
+            "title": "Submarket",
+            "type": "string"
+          },
+          "unit_id": {
+            "title": "Unit Id",
+            "type": "string"
+          },
+          "unit_rsf": {
+            "title": "Unit Rsf",
+            "type": "integer"
+          },
+          "upside_pct": {
+            "title": "Upside Pct",
+            "type": "number"
+          }
+        },
+        "required": [
+          "prediction_id",
+          "unit_id",
+          "property_name",
+          "submarket",
+          "market",
+          "asset_class",
+          "unit_rsf",
+          "floor",
+          "p50",
+          "p10",
+          "p90",
+          "current_rent_psf",
+          "upside_pct",
+          "lease_expiration",
+          "baseline_mode"
+        ],
+        "title": "RentQueueItem",
+        "type": "object"
+      },
+      "RiskQueueItem": {
+        "properties": {
+          "band": {
+            "enum": [
+              "green",
+              "amber",
+              "red"
+            ],
+            "title": "Band",
+            "type": "string"
+          },
+          "baseline_mode": {
+            "title": "Baseline Mode",
+            "type": "boolean"
+          },
+          "credit_rating": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Credit Rating"
+          },
+          "industry": {
+            "title": "Industry",
+            "type": "string"
+          },
+          "model_version": {
+            "title": "Model Version",
+            "type": "integer"
+          },
+          "monthly_rent_due": {
+            "title": "Monthly Rent Due",
+            "type": "number"
+          },
+          "pd": {
+            "title": "Pd",
+            "type": "number"
+          },
+          "prediction_id": {
+            "format": "uuid",
+            "title": "Prediction Id",
+            "type": "string"
+          },
+          "tenant_id": {
+            "title": "Tenant Id",
+            "type": "string"
+          },
+          "tenant_name": {
+            "title": "Tenant Name",
+            "type": "string"
+          },
+          "top_driver": {
+            "title": "Top Driver",
+            "type": "string"
+          },
+          "trend": {
+            "description": "Monthly mean days-late, last 12 months",
+            "items": {
+              "type": "number"
+            },
+            "title": "Trend",
+            "type": "array"
+          }
+        },
+        "required": [
+          "prediction_id",
+          "tenant_id",
+          "tenant_name",
+          "industry",
+          "credit_rating",
+          "pd",
+          "band",
+          "model_version",
+          "baseline_mode",
+          "top_driver",
+          "monthly_rent_due",
+          "trend"
+        ],
+        "title": "RiskQueueItem",
+        "type": "object"
+      },
+      "RiskScoreRequest": {
+        "properties": {
+          "tenant_id": {
+            "title": "Tenant Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "tenant_id"
+        ],
+        "title": "RiskScoreRequest",
+        "type": "object"
+      },
+      "RiskScoreResponse": {
+        "properties": {
+          "as_of": {
+            "format": "date",
+            "title": "As Of",
+            "type": "string"
+          },
+          "band": {
+            "enum": [
+              "green",
+              "amber",
+              "red"
+            ],
+            "title": "Band",
+            "type": "string"
+          },
+          "baseline_mode": {
+            "title": "Baseline Mode",
+            "type": "boolean"
+          },
+          "drivers": {
+            "items": {
+              "$ref": "#/components/schemas/ShapDriverOut"
+            },
+            "title": "Drivers",
+            "type": "array"
+          },
+          "model_version": {
+            "title": "Model Version",
+            "type": "integer"
+          },
+          "pd": {
+            "description": "Calibrated probability of default within 6 months",
+            "title": "Pd",
+            "type": "number"
+          },
+          "prediction_id": {
+            "format": "uuid",
+            "title": "Prediction Id",
+            "type": "string"
+          },
+          "tenant_id": {
+            "title": "Tenant Id",
+            "type": "string"
+          },
+          "tenant_name": {
+            "title": "Tenant Name",
+            "type": "string"
+          }
+        },
+        "required": [
+          "prediction_id",
+          "tenant_id",
+          "tenant_name",
+          "pd",
+          "band",
+          "as_of",
+          "model_version",
+          "baseline_mode",
+          "drivers"
+        ],
+        "title": "RiskScoreResponse",
+        "type": "object"
+      },
+      "ShapDriverOut": {
+        "properties": {
+          "feature": {
+            "title": "Feature",
+            "type": "string"
+          },
+          "label": {
+            "title": "Label",
+            "type": "string"
+          },
+          "shap": {
+            "title": "Shap",
+            "type": "number"
+          },
+          "value": {
+            "title": "Value",
+            "type": "number"
+          }
+        },
+        "required": [
+          "feature",
+          "label",
+          "value",
+          "shap"
+        ],
+        "title": "ShapDriverOut",
+        "type": "object"
+      },
+      "TenantDetail": {
+        "properties": {
+          "credit_rating": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Credit Rating"
+          },
+          "industry": {
+            "title": "Industry",
+            "type": "string"
+          },
+          "latest": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/RiskScoreResponse"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "leases": {
+            "items": {
+              "$ref": "#/components/schemas/TenantLease"
+            },
+            "title": "Leases",
+            "type": "array"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "payment_history": {
+            "items": {
+              "$ref": "#/components/schemas/PaymentRow"
+            },
+            "title": "Payment History",
+            "type": "array"
+          },
+          "score_history": {
+            "items": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "title": "Score History",
+            "type": "array"
+          },
+          "tenant_id": {
+            "title": "Tenant Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "tenant_id",
+          "name",
+          "industry",
+          "credit_rating",
+          "latest",
+          "payment_history",
+          "leases",
+          "score_history"
+        ],
+        "title": "TenantDetail",
+        "type": "object"
+      },
+      "TenantLease": {
+        "properties": {
+          "asset_class": {
+            "title": "Asset Class",
+            "type": "string"
+          },
+          "base_rent_psf": {
+            "title": "Base Rent Psf",
+            "type": "number"
+          },
+          "commencement": {
+            "format": "date",
+            "title": "Commencement",
+            "type": "string"
+          },
+          "expiration": {
+            "format": "date",
+            "title": "Expiration",
+            "type": "string"
+          },
+          "lease_id": {
+            "title": "Lease Id",
+            "type": "string"
+          },
+          "lease_type": {
+            "title": "Lease Type",
+            "type": "string"
+          },
+          "property_name": {
+            "title": "Property Name",
+            "type": "string"
+          },
+          "submarket": {
+            "title": "Submarket",
+            "type": "string"
+          },
+          "term_months": {
+            "title": "Term Months",
+            "type": "integer"
+          },
+          "unit_id": {
+            "title": "Unit Id",
+            "type": "string"
+          },
+          "unit_rsf": {
+            "title": "Unit Rsf",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "lease_id",
+          "unit_id",
+          "property_name",
+          "submarket",
+          "asset_class",
+          "commencement",
+          "expiration",
+          "base_rent_psf",
+          "term_months",
+          "lease_type",
+          "unit_rsf"
+        ],
+        "title": "TenantLease",
+        "type": "object"
+      },
+      "ValidationError": {
+        "properties": {
+          "ctx": {
+            "title": "Context",
+            "type": "object"
+          },
+          "input": {
+            "title": "Input"
+          },
+          "loc": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ]
+            },
+            "title": "Location",
+            "type": "array"
+          },
+          "msg": {
+            "title": "Message",
+            "type": "string"
+          },
+          "type": {
+            "title": "Error Type",
+            "type": "string"
+          }
+        },
+        "required": [
+          "loc",
+          "msg",
+          "type"
+        ],
+        "title": "ValidationError",
+        "type": "object"
+      }
+    },
+    "securitySchemes": {
+      "HTTPBearer": {
+        "scheme": "bearer",
+        "type": "http"
+      }
+    }
+  },
+  "info": {
+    "description": "CRE rent forecasting & tenant default-risk platform.",
+    "title": "TerraSignal API",
+    "version": "0.1.0"
+  },
+  "openapi": "3.1.0",
+  "paths": {
+    "/api/v1/auth/login": {
+      "post": {
+        "operationId": "login_api_v1_auth_login_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LoginResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Login",
+        "tags": [
+          "auth"
+        ]
+      }
+    },
+    "/api/v1/feedback": {
+      "post": {
+        "operationId": "submit_feedback_api_v1_feedback_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/FeedbackRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FeedbackResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Submit Feedback",
+        "tags": [
+          "feedback"
+        ]
+      }
+    },
+    "/api/v1/forecasts/queue": {
+      "get": {
+        "operationId": "rent_queue_api_v1_forecasts_queue_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "default": 100,
+              "title": "Limit",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "offset",
+            "required": false,
+            "schema": {
+              "default": 0,
+              "title": "Offset",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/RentQueueItem"
+                  },
+                  "title": "Response Rent Queue Api V1 Forecasts Queue Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Rent Queue",
+        "tags": [
+          "forecasts"
+        ]
+      }
+    },
+    "/api/v1/forecasts/rent": {
+      "post": {
+        "operationId": "forecast_rent_api_v1_forecasts_rent_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RentForecastRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RentForecastResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Forecast Rent",
+        "tags": [
+          "forecasts"
+        ]
+      }
+    },
+    "/api/v1/forecasts/{prediction_id}/rationale": {
+      "post": {
+        "operationId": "rationale_api_v1_forecasts__prediction_id__rationale_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "prediction_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Prediction Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RationaleResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Rationale",
+        "tags": [
+          "forecasts"
+        ]
+      }
+    },
+    "/api/v1/governance/audit": {
+      "get": {
+        "operationId": "audit_trail_api_v1_governance_audit_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "event_type",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Event Type"
+            }
+          },
+          {
+            "in": "query",
+            "name": "entity_id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Entity Id"
+            }
+          },
+          {
+            "in": "query",
+            "name": "actor",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Actor"
+            }
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "default": 100,
+              "title": "Limit",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "offset",
+            "required": false,
+            "schema": {
+              "default": 0,
+              "title": "Offset",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/AuditEventOut"
+                  },
+                  "title": "Response Audit Trail Api V1 Governance Audit Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Audit Trail",
+        "tags": [
+          "governance"
+        ]
+      }
+    },
+    "/api/v1/governance/cards/{model_name}/{version}": {
+      "get": {
+        "operationId": "model_card_api_v1_governance_cards__model_name___version__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "model_name",
+            "required": true,
+            "schema": {
+              "title": "Model Name",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "version",
+            "required": true,
+            "schema": {
+              "title": "Version",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Model Card",
+        "tags": [
+          "governance"
+        ]
+      }
+    },
+    "/api/v1/governance/drift": {
+      "get": {
+        "operationId": "drift_api_v1_governance_drift_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/DriftMetricOut"
+                  },
+                  "title": "Response Drift Api V1 Governance Drift Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Drift",
+        "tags": [
+          "governance"
+        ]
+      }
+    },
+    "/api/v1/governance/kill-switch": {
+      "get": {
+        "description": "Current baseline-mode flag. Analysts may read it (the UI banners on it);\nonly admins may flip it.",
+        "operationId": "kill_switch_state_api_v1_governance_kill_switch_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/KillSwitchState"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Kill Switch State",
+        "tags": [
+          "governance"
+        ]
+      },
+      "post": {
+        "description": "Flip the API into (or out of) baseline mode without a redeploy. The flag\nlives in the DB so it survives a restart and takes effect on the next\nrequest; the flip is an audited action (\u00a78.6).",
+        "operationId": "set_kill_switch_api_v1_governance_kill_switch_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/KillSwitchRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/KillSwitchState"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Set Kill Switch",
+        "tags": [
+          "governance"
+        ]
+      }
+    },
+    "/api/v1/governance/lineage/{prediction_id}": {
+      "get": {
+        "operationId": "lineage_api_v1_governance_lineage__prediction_id__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "prediction_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Prediction Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LineageOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Lineage",
+        "tags": [
+          "governance"
+        ]
+      }
+    },
+    "/api/v1/models/active": {
+      "get": {
+        "operationId": "models_active_api_v1_models_active_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/ModelVersionOut"
+                  },
+                  "title": "Response Models Active Api V1 Models Active Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Models Active",
+        "tags": [
+          "governance"
+        ]
+      }
+    },
+    "/api/v1/models/{model_name}/versions/{version}/approve": {
+      "post": {
+        "description": "Human approval gate. Runs sync (registry helper) in the threadpool.",
+        "operationId": "approve_api_v1_models__model_name__versions__version__approve_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "model_name",
+            "required": true,
+            "schema": {
+              "title": "Model Name",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "version",
+            "required": true,
+            "schema": {
+              "title": "Version",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": {
+                    "type": "string"
+                  },
+                  "title": "Response Approve Api V1 Models  Model Name  Versions  Version  Approve Post",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Approve",
+        "tags": [
+          "governance"
+        ]
+      }
+    },
+    "/api/v1/portfolio/summary": {
+      "get": {
+        "operationId": "portfolio_summary_api_v1_portfolio_summary_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PortfolioSummary"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Portfolio Summary",
+        "tags": [
+          "portfolio"
+        ]
+      }
+    },
+    "/api/v1/risk/queue": {
+      "get": {
+        "operationId": "risk_queue_api_v1_risk_queue_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "default": 50,
+              "title": "Limit",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "offset",
+            "required": false,
+            "schema": {
+              "default": 0,
+              "title": "Offset",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/RiskQueueItem"
+                  },
+                  "title": "Response Risk Queue Api V1 Risk Queue Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Risk Queue",
+        "tags": [
+          "risk"
+        ]
+      }
+    },
+    "/api/v1/risk/score": {
+      "post": {
+        "operationId": "score_tenant_api_v1_risk_score_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RiskScoreRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RiskScoreResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Score Tenant",
+        "tags": [
+          "risk"
+        ]
+      }
+    },
+    "/api/v1/risk/tenants/{tenant_id}": {
+      "get": {
+        "operationId": "tenant_detail_api_v1_risk_tenants__tenant_id__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "tenant_id",
+            "required": true,
+            "schema": {
+              "title": "Tenant Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TenantDetail"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Tenant Detail",
+        "tags": [
+          "risk"
+        ]
+      }
+    },
+    "/health": {
+      "get": {
+        "description": "Unauthenticated liveness probe. `models_ready` reflects whether approved\nmodels were loaded \u2014 false is a valid booted state (DB still warming).",
+        "operationId": "health_health_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Health Health Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Health",
+        "tags": [
+          "meta"
+        ]
+      }
+    }
+  }
+}

@@ -1,0 +1,23 @@
+# Governed thresholds — changes require PR label `governance-change` and emit
+# an audit event on deploy. These numbers are policy, not tuning knobs.
+dq:
+  quarantine_halt_rate: 0.02        # >2% of any core table quarantined => halt + page
+  reconciliation_tolerance: 0.01    # payments must tie to rent schedule within ±1%
+
+risk_scorer:
+  watchlist_decile: 0.10            # top decile goes to the risk queue
+  amber_pd: 0.15                    # UI banding for calibrated PD
+  red_pd: 0.30
+
+drift:
+  psi_amber: 0.10
+  psi_red: 0.20                     # PSI > 0.2 on a top-importance feature => alarm
+
+model_gates:
+  rent_forecaster_min_mape_improvement: 0.15   # XGB must beat both baselines by >=15% rel.
+  rent_forecaster_max_mape: 0.08               # 12-month horizon gate
+  risk_scorer_min_pr_auc: 0.45
+  risk_scorer_max_brier: 0.08
+
+kill_switch:
+  baseline_mode: false              # true => API serves comp-median heuristics, labeled

@@ -1,0 +1,22 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: light;
+}
+
+body {
+  @apply bg-surface-sunken text-ink antialiased;
+  font-feature-settings: "tnum" 1;
+}
+
+/* Tabular numbers everywhere money or metrics are shown. */
+.tnum {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Keyboard focus ring — accessibility floor (CLAUDE.md §3). */
+*:focus-visible {
+  @apply outline-none ring-2 ring-brand ring-offset-1 ring-offset-surface;
+}
