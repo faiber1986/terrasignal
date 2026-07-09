@@ -1,3 +1,10 @@
+"use client";
+
+import { useTheme } from "@/lib/theme";
+
+const RISING_COLOR = { light: "#b45309", dark: "#f59e0b" };
+const FALLING_COLOR = { light: "#15803d", dark: "#22c55e" };
+
 /** Tiny inline SVG sparkline for days-late trend in the risk queue. No chart
  * library — it has to render fast in dozens of table rows. */
 export function Sparkline({
@@ -9,6 +16,7 @@ export function Sparkline({
   width?: number;
   height?: number;
 }) {
+  const { theme } = useTheme();
   if (values.length < 2) {
     return <span className="text-xs text-ink-faint">—</span>;
   }
@@ -27,7 +35,7 @@ export function Sparkline({
       <polyline
         points={points}
         fill="none"
-        stroke={rising ? "#b45309" : "#15803d"}
+        stroke={rising ? RISING_COLOR[theme] : FALLING_COLOR[theme]}
         strokeWidth="1.5"
         strokeLinejoin="round"
         strokeLinecap="round"

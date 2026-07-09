@@ -9,6 +9,7 @@ import { Sparkline } from "@/components/sparkline";
 import { BandBadge, Card, ErrorNote, Skeleton, Tag } from "@/components/ui/primitives";
 import { apiFetch, type Schemas } from "@/lib/api/client";
 import { bandLabel, pct } from "@/lib/format";
+import { useLocale } from "@/lib/i18n";
 import { cn } from "@/lib/utils";
 
 type RiskQueueItem = Schemas["RiskQueueItem"];
@@ -23,6 +24,7 @@ export default function RiskQueuePage() {
 }
 
 function RiskQueue() {
+  const { t } = useLocale();
   const [sort, setSort] = useState<SortKey>("pd");
   const { data, isLoading, error } = useQuery({
     queryKey: ["risk-queue"],
@@ -37,29 +39,26 @@ function RiskQueue() {
 
   return (
     <>
-      <PageHeader
-        title="Risk Queue"
-        subtitle="Tenants ranked by calibrated probability of default within 6 months"
-      />
+      <PageHeader title={t("risk.title")} subtitle={t("risk.subtitle")} />
 
-      {error && <ErrorNote>Could not load the queue — is the backend seeded and scored?</ErrorNote>}
+      {error && <ErrorNote>{t("risk.errorQueue")}</ErrorNote>}
 
       <Card className="overflow-hidden">
         <table className="w-full text-sm">
           <thead className="border-b border-surface-border bg-surface-sunken text-left text-xs text-ink-muted">
             <tr>
               <Th onClick={() => setSort("tenant_name")} active={sort === "tenant_name"}>
-                Tenant
+                {t("risk.colTenant")}
               </Th>
-              <Th>Industry</Th>
+              <Th>{t("risk.colIndustry")}</Th>
               <Th onClick={() => setSort("credit_rating")} active={sort === "credit_rating"}>
-                Credit
+                {t("risk.colCredit")}
               </Th>
               <Th onClick={() => setSort("pd")} active={sort === "pd"} className="text-right">
-                PD (6m)
+                {t("risk.colPd")}
               </Th>
-              <Th>Top driver</Th>
-              <Th className="text-right">Days-late trend</Th>
+              <Th>{t("risk.colTopDriver")}</Th>
+              <Th className="text-right">{t("risk.colTrend")}</Th>
             </tr>
           </thead>
           <tbody className="divide-y divide-surface-border">
@@ -82,12 +81,12 @@ function RiskQueue() {
                 </td>
                 <td className="px-4 py-2.5 text-ink-muted">{r.industry}</td>
                 <td className="px-4 py-2.5">
-                  <Tag>{r.credit_rating ?? "NR"}</Tag>
+                  <Tag>{r.credit_rating ?? t("risk.notRatedShort")}</Tag>
                 </td>
                 <td className="px-4 py-2.5 text-right">
                   <div className="flex items-center justify-end gap-2">
                     <span className="tnum font-semibold text-ink">{pct(r.pd)}</span>
-                    <BandBadge band={r.band} label={bandLabel(r.band)} />
+                    <BandBadge band={r.band} label={bandLabel(r.band, t)} />
                   </div>
                 </td>
                 <td className="px-4 py-2.5 text-xs text-ink-muted">{r.top_driver}</td>
@@ -102,7 +101,7 @@ function RiskQueue() {
             {!isLoading && rows.length === 0 && (
               <tr>
                 <td colSpan={6} className="px-4 py-10 text-center text-sm text-ink-faint">
-                  No scored tenants yet. Run batch scoring to populate the queue.
+                  {t("risk.empty")}
                 </td>
               </tr>
             )}

@@ -38,20 +38,25 @@ export function rentPsf(value: number): string {
   return `${usd2(value)}/SF`;
 }
 
-export function shortDate(iso: string): string {
-  return new Date(iso).toLocaleDateString("en-US", {
+const INTL_LOCALE: Record<string, string> = { en: "en-US", es: "es-ES" };
+
+export function shortDate(iso: string, locale = "en"): string {
+  return new Date(iso).toLocaleDateString(INTL_LOCALE[locale] ?? "en-US", {
     month: "short",
     day: "numeric",
     year: "numeric",
   });
 }
 
-export function monthLabel(iso: string): string {
-  return new Date(iso).toLocaleDateString("en-US", { month: "short", year: "2-digit" });
+export function monthLabel(iso: string, locale = "en"): string {
+  return new Date(iso).toLocaleDateString(INTL_LOCALE[locale] ?? "en-US", {
+    month: "short",
+    year: "2-digit",
+  });
 }
 
 export type Band = "green" | "amber" | "red";
 
-export function bandLabel(band: Band): string {
-  return { green: "Low", amber: "Watch", red: "High" }[band];
+export function bandLabel(band: Band, t: (key: string) => string): string {
+  return t(`common.band.${band}`);
 }

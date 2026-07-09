@@ -20,6 +20,7 @@ import {
 } from "@/components/ui/primitives";
 import { apiFetch, type Schemas } from "@/lib/api/client";
 import { bandLabel, pct, rentPsf, shortDate, usd } from "@/lib/format";
+import { useLocale } from "@/lib/i18n";
 
 type TenantDetail = Schemas["TenantDetail"];
 type RiskScoreResponse = Schemas["RiskScoreResponse"];
@@ -34,6 +35,7 @@ export default function TenantPage({ params }: { params: Promise<{ tenantId: str
 }
 
 function TenantDetailView({ tenantId }: { tenantId: string }) {
+  const { t, locale } = useLocale();
   const qc = useQueryClient();
   const key = ["tenant", tenantId];
   const { data, isLoading, error } = useQuery({
@@ -51,7 +53,7 @@ function TenantDetailView({ tenantId }: { tenantId: string }) {
   });
 
   if (error) {
-    return <ErrorNote>Tenant not found, or the backend isn’t seeded.</ErrorNote>;
+    return <ErrorNote>{t("tenant.errorNotFound")}</ErrorNote>;
   }
 
   const latest = data?.latest ?? null;
@@ -60,7 +62,7 @@ function TenantDetailView({ tenantId }: { tenantId: string }) {
     <>
       <div className="mb-2">
         <Link href="/risk" className="text-sm text-ink-muted hover:text-brand">
-          ← Risk Queue
+          {t("tenant.back")}
         </Link>
       </div>
       <PageHeader
@@ -68,7 +70,7 @@ function TenantDetailView({ tenantId }: { tenantId: string }) {
         subtitle={data ? `${data.industry} · ${data.tenant_id}` : undefined}
         actions={
           <Button size="sm" onClick={() => score.mutate()} disabled={score.isPending}>
-            {score.isPending ? "Scoring…" : "Score now"}
+            {score.isPending ? t("tenant.scoring") : t("tenant.scoreNow")}
           </Button>
         }
       />
@@ -77,7 +79,7 @@ function TenantDetailView({ tenantId }: { tenantId: string }) {
         <div className="space-y-4 lg:col-span-1">
           <Card>
             <CardHeader>
-              <CardTitle>Default risk</CardTitle>
+              <CardTitle>{t("tenant.defaultRisk")}</CardTitle>
             </CardHeader>
             <CardBody>
               {isLoading ? (
@@ -86,15 +88,19 @@ function TenantDetailView({ tenantId }: { tenantId: string }) {
                 <>
                   <div className="flex items-baseline gap-3">
                     <span className="tnum text-3xl font-semibold text-ink">{pct(latest.pd)}</span>
-                    <BandBadge band={latest.band} label={bandLabel(latest.band)} />
+                    <BandBadge band={latest.band} label={bandLabel(latest.band, t)} />
                   </div>
                   <p className="mt-1 text-xs text-ink-muted">
-                    Calibrated PD within 6 months · model v{latest.model_version} ·{" "}
-                    {latest.baseline_mode ? "baseline heuristic" : "model"} · as of{" "}
-                    {shortDate(latest.as_of)}
+                    {t("tenant.scoreMeta", {
+                      version: latest.model_version,
+                      source: latest.baseline_mode
+                        ? t("tenant.sourceBaseline")
+                        : t("tenant.sourceModel"),
+                      date: shortDate(latest.as_of, locale),
+                    })}
                   </p>
                   <div className="mt-4">
-                    <p className="mb-2 text-xs font-medium text-ink-muted">Why this score</p>
+                    <p className="mb-2 text-xs font-medium text-ink-muted">{t("tenant.whyThisScore")}</p>
                     <ShapDrivers drivers={latest.drivers} />
                   </div>
                   <div className="mt-4 border-t border-surface-border pt-3">
@@ -103,7 +109,7 @@ function TenantDetailView({ tenantId }: { tenantId: string }) {
                 </>
               ) : (
                 <p className="text-sm text-ink-muted">
-                  No score yet. Use <span className="font-medium">Score now</span> to generate one.
+                  {t("tenant.noScoreYet", { scoreNow: t("tenant.scoreNow") })}
                 </p>
               )}
             </CardBody>
@@ -111,12 +117,18 @@ function TenantDetailView({ tenantId }: { tenantId: string }) {
 
           <Card>
             <CardHeader>
-              <CardTitle>Tenant</CardTitle>
+              <CardTitle>{t("tenant.tenantCard")}</CardTitle>
             </CardHeader>
             <CardBody className="space-y-1 text-sm">
-              <Row label="Industry" value={data?.industry} />
-              <Row label="Credit rating" value={data?.credit_rating ?? "Not rated"} />
-              <Row label="Active leases" value={data ? data.leases.length.toString() : undefined} />
+              <Row label={t("tenant.industry")} value={data?.industry} />
+              <Row
+                label={t("tenant.creditRating")}
+                value={data?.credit_rating ?? t("tenant.notRated")}
+              />
+              <Row
+                label={t("tenant.activeLeases")}
+                value={data ? data.leases.length.toString() : undefined}
+              />
             </CardBody>
           </Card>
         </div>
@@ -124,17 +136,17 @@ function TenantDetailView({ tenantId }: { tenantId: string }) {
         <div className="space-y-4 lg:col-span-2">
           <Card>
             <CardHeader>
-              <CardTitle>Leases</CardTitle>
+              <CardTitle>{t("tenant.leases")}</CardTitle>
             </CardHeader>
             <CardBody className="p-0">
               <table className="w-full text-sm">
                 <thead className="border-b border-surface-border bg-surface-sunken text-left text-xs text-ink-muted">
                   <tr>
-                    <th className="px-4 py-2 font-medium">Lease</th>
-                    <th className="px-4 py-2 font-medium">Property</th>
-                    <th className="px-4 py-2 text-right font-medium">Base rent</th>
-                    <th className="px-4 py-2 text-right font-medium">RSF</th>
-                    <th className="px-4 py-2 font-medium">Expires</th>
+                    <th className="px-4 py-2 font-medium">{t("tenant.colLease")}</th>
+                    <th className="px-4 py-2 font-medium">{t("tenant.colProperty")}</th>
+                    <th className="px-4 py-2 text-right font-medium">{t("tenant.colBaseRent")}</th>
+                    <th className="px-4 py-2 text-right font-medium">{t("tenant.colRsf")}</th>
+                    <th className="px-4 py-2 font-medium">{t("tenant.colExpires")}</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-surface-border">
@@ -150,7 +162,7 @@ function TenantDetailView({ tenantId }: { tenantId: string }) {
                       </td>
                       <td className="px-4 py-2 text-right tnum">{rentPsf(l.base_rent_psf)}</td>
                       <td className="px-4 py-2 text-right tnum">{l.unit_rsf.toLocaleString()}</td>
-                      <td className="px-4 py-2 tnum text-ink-muted">{shortDate(l.expiration)}</td>
+                      <td className="px-4 py-2 tnum text-ink-muted">{shortDate(l.expiration, locale)}</td>
                     </tr>
                   ))}
                   {isLoading && (
@@ -167,29 +179,29 @@ function TenantDetailView({ tenantId }: { tenantId: string }) {
 
           <Card>
             <CardHeader>
-              <CardTitle>Recent payments</CardTitle>
+              <CardTitle>{t("tenant.recentPayments")}</CardTitle>
             </CardHeader>
             <CardBody className="p-0">
               <table className="w-full text-sm">
                 <thead className="border-b border-surface-border bg-surface-sunken text-left text-xs text-ink-muted">
                   <tr>
-                    <th className="px-4 py-2 font-medium">Due</th>
-                    <th className="px-4 py-2 font-medium">Paid</th>
-                    <th className="px-4 py-2 text-right font-medium">Amount due</th>
-                    <th className="px-4 py-2 text-right font-medium">Days late</th>
+                    <th className="px-4 py-2 font-medium">{t("tenant.colDue")}</th>
+                    <th className="px-4 py-2 font-medium">{t("tenant.colPaid")}</th>
+                    <th className="px-4 py-2 text-right font-medium">{t("tenant.colAmountDue")}</th>
+                    <th className="px-4 py-2 text-right font-medium">{t("tenant.colDaysLate")}</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-surface-border">
                   {(data?.payment_history ?? []).slice(-10).reverse().map((p, i) => (
                     <tr key={`${p.lease_id}-${p.due_date}-${i}`}>
-                      <td className="px-4 py-2 tnum text-ink-muted">{shortDate(p.due_date)}</td>
+                      <td className="px-4 py-2 tnum text-ink-muted">{shortDate(p.due_date, locale)}</td>
                       <td className="px-4 py-2 tnum text-ink-muted">
-                        {p.paid_date ? shortDate(p.paid_date) : "—"}
+                        {p.paid_date ? shortDate(p.paid_date, locale) : "—"}
                       </td>
                       <td className="px-4 py-2 text-right tnum">{usd(p.amount_due)}</td>
                       <td className="px-4 py-2 text-right">
                         {p.days_late == null ? (
-                          <Tag>unpaid</Tag>
+                          <Tag>{t("common.unpaid")}</Tag>
                         ) : (
                           <span className={p.days_late > 5 ? "tnum text-band-red" : "tnum text-ink-muted"}>
                             {p.days_late}

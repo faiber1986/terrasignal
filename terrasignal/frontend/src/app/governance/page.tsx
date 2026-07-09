@@ -18,6 +18,7 @@ import {
 import { apiFetch, ApiError, type Schemas } from "@/lib/api/client";
 import { hasRole, useAuth } from "@/lib/auth";
 import { shortDate } from "@/lib/format";
+import { useLocale } from "@/lib/i18n";
 import { cn } from "@/lib/utils";
 
 type ModelVersionOut = Schemas["ModelVersionOut"];
@@ -25,8 +26,8 @@ type DriftMetricOut = Schemas["DriftMetricOut"];
 type AuditEventOut = Schemas["AuditEventOut"];
 type KillSwitchState = Schemas["KillSwitchState"];
 
-const TABS = ["Kill switch", "Models", "Drift", "Audit"] as const;
-type Tab = (typeof TABS)[number];
+const TAB_KEYS = ["killSwitch", "models", "drift", "audit"] as const;
+type Tab = (typeof TAB_KEYS)[number];
 
 export default function GovernancePage() {
   return (
@@ -37,39 +38,44 @@ export default function GovernancePage() {
 }
 
 function Governance() {
-  const [tab, setTab] = useState<Tab>("Kill switch");
+  const { t } = useLocale();
+  const [tab, setTab] = useState<Tab>("killSwitch");
+  const TAB_LABELS: Record<Tab, string> = {
+    killSwitch: t("governance.tabKillSwitch"),
+    models: t("governance.tabModels"),
+    drift: t("governance.tabDrift"),
+    audit: t("governance.tabAudit"),
+  };
   return (
     <>
-      <PageHeader
-        title="Model Governance"
-        subtitle="Active versions, approvals, drift, audit trail, and the kill switch"
-      />
+      <PageHeader title={t("governance.title")} subtitle={t("governance.subtitle")} />
       <div className="mb-4 flex gap-1 border-b border-surface-border">
-        {TABS.map((t) => (
+        {TAB_KEYS.map((k) => (
           <button
-            key={t}
-            onClick={() => setTab(t)}
+            key={k}
+            onClick={() => setTab(k)}
             className={cn(
               "-mb-px border-b-2 px-3 py-2 text-sm font-medium",
-              tab === t
+              tab === k
                 ? "border-brand text-ink"
                 : "border-transparent text-ink-muted hover:text-ink",
             )}
           >
-            {t}
+            {TAB_LABELS[k]}
           </button>
         ))}
       </div>
 
-      {tab === "Kill switch" && <KillSwitchPanel />}
-      {tab === "Models" && <ModelsPanel />}
-      {tab === "Drift" && <DriftPanel />}
-      {tab === "Audit" && <AuditPanel />}
+      {tab === "killSwitch" && <KillSwitchPanel />}
+      {tab === "models" && <ModelsPanel />}
+      {tab === "drift" && <DriftPanel />}
+      {tab === "audit" && <AuditPanel />}
     </>
   );
 }
 
 function KillSwitchPanel() {
+  const { t } = useLocale();
   const { user } = useAuth();
   const qc = useQueryClient();
   const isAdmin = hasRole(user, "admin");
@@ -96,22 +102,18 @@ function KillSwitchPanel() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Baseline-mode kill switch</CardTitle>
+        <CardTitle>{t("governance.killSwitchTitle")}</CardTitle>
       </CardHeader>
       <CardBody className="space-y-4">
-        <p className="text-sm text-ink-muted">
-          Engaging baseline mode pauses both models instantly (no redeploy). Scoring and forecasting
-          fall back to clearly-labeled comp-median heuristics, and the flip is written to the audit
-          trail.
-        </p>
+        <p className="text-sm text-ink-muted">{t("governance.killSwitchBody")}</p>
         <div className="flex items-center gap-3">
-          <span className="text-sm text-ink">Current state:</span>
+          <span className="text-sm text-ink">{t("governance.currentState")}</span>
           {state.isLoading ? (
             <Skeleton className="h-6 w-24" />
           ) : engaged ? (
-            <BandBadge band="amber" label="Baseline (models paused)" />
+            <BandBadge band="amber" label={t("governance.baselinePaused")} />
           ) : (
-            <BandBadge band="green" label="Live (models serving)" />
+            <BandBadge band="green" label={t("governance.liveServing")} />
           )}
         </div>
 
@@ -121,14 +123,18 @@ function KillSwitchPanel() {
             disabled={flip.isPending || state.isLoading}
             onClick={() => flip.mutate(!engaged)}
           >
-            {flip.isPending ? "Applying…" : engaged ? "Restore models" : "Engage kill switch"}
+            {flip.isPending
+              ? t("governance.applying")
+              : engaged
+                ? t("governance.restoreModels")
+                : t("governance.engageKillSwitch")}
           </Button>
         ) : (
-          <p className="text-sm text-ink-faint">Requires the admin role to flip.</p>
+          <p className="text-sm text-ink-faint">{t("governance.adminOnly")}</p>
         )}
         {flip.error && (
           <ErrorNote>
-            {flip.error instanceof ApiError ? flip.error.message : "Failed to flip the switch"}
+            {flip.error instanceof ApiError ? flip.error.message : t("governance.errorFlip")}
           </ErrorNote>
         )}
       </CardBody>
@@ -137,6 +143,7 @@ function KillSwitchPanel() {
 }
 
 function ModelsPanel() {
+  const { t, locale } = useLocale();
   const { user } = useAuth();
   const qc = useQueryClient();
   const isApprover = hasRole(user, "approver");
@@ -152,18 +159,18 @@ function ModelsPanel() {
     onSuccess: () => qc.invalidateQueries({ queryKey: ["models-active"] }),
   });
 
-  if (models.error) return <ErrorNote>Could not load the registry.</ErrorNote>;
+  if (models.error) return <ErrorNote>{t("governance.errorRegistry")}</ErrorNote>;
 
   return (
     <Card className="overflow-hidden">
       <table className="w-full text-sm">
         <thead className="border-b border-surface-border bg-surface-sunken text-left text-xs text-ink-muted">
           <tr>
-            <th className="px-4 py-2 font-medium">Model</th>
-            <th className="px-4 py-2 font-medium">Ver</th>
-            <th className="px-4 py-2 font-medium">Status</th>
-            <th className="px-4 py-2 font-medium">Key metrics</th>
-            <th className="px-4 py-2 font-medium">Approved</th>
+            <th className="px-4 py-2 font-medium">{t("governance.colModel")}</th>
+            <th className="px-4 py-2 font-medium">{t("governance.colVersion")}</th>
+            <th className="px-4 py-2 font-medium">{t("governance.colStatus")}</th>
+            <th className="px-4 py-2 font-medium">{t("governance.colMetrics")}</th>
+            <th className="px-4 py-2 font-medium">{t("governance.colApproved")}</th>
             <th className="px-4 py-2" />
           </tr>
         </thead>
@@ -189,12 +196,12 @@ function ModelsPanel() {
                   .join(" · ")}
               </td>
               <td className="px-4 py-2.5 text-xs text-ink-muted">
-                {m.approved_by ? `${m.approved_by} · ${shortDate(m.approved_at!)}` : "—"}
+                {m.approved_by ? `${m.approved_by} · ${shortDate(m.approved_at!, locale)}` : "—"}
               </td>
               <td className="px-4 py-2.5 text-right">
                 {m.status === "PendingManualApproval" && isApprover && (
                   <Button size="sm" disabled={approve.isPending} onClick={() => approve.mutate(m)}>
-                    Approve
+                    {t("governance.approve")}
                   </Button>
                 )}
               </td>
@@ -205,7 +212,7 @@ function ModelsPanel() {
       {approve.error && (
         <div className="p-3">
           <ErrorNote>
-            {approve.error instanceof ApiError ? approve.error.message : "Approval failed"}
+            {approve.error instanceof ApiError ? approve.error.message : t("governance.errorApprove")}
           </ErrorNote>
         </div>
       )}
@@ -214,23 +221,24 @@ function ModelsPanel() {
 }
 
 function DriftPanel() {
+  const { t, locale } = useLocale();
   const drift = useQuery({
     queryKey: ["drift"],
     queryFn: () => apiFetch<DriftMetricOut[]>("/governance/drift"),
   });
 
-  if (drift.error) return <ErrorNote>Could not load drift metrics.</ErrorNote>;
+  if (drift.error) return <ErrorNote>{t("governance.errorDrift")}</ErrorNote>;
 
   return (
     <Card className="overflow-hidden">
       <table className="w-full text-sm">
         <thead className="border-b border-surface-border bg-surface-sunken text-left text-xs text-ink-muted">
           <tr>
-            <th className="px-4 py-2 font-medium">Model</th>
-            <th className="px-4 py-2 font-medium">Feature</th>
-            <th className="px-4 py-2 text-right font-medium">PSI</th>
-            <th className="px-4 py-2 font-medium">Status</th>
-            <th className="px-4 py-2 font-medium">Computed</th>
+            <th className="px-4 py-2 font-medium">{t("governance.colModel")}</th>
+            <th className="px-4 py-2 font-medium">{t("governance.colFeature")}</th>
+            <th className="px-4 py-2 text-right font-medium">{t("governance.colPsi")}</th>
+            <th className="px-4 py-2 font-medium">{t("governance.colStatus")}</th>
+            <th className="px-4 py-2 font-medium">{t("governance.colComputed")}</th>
           </tr>
         </thead>
         <tbody className="divide-y divide-surface-border">
@@ -249,13 +257,15 @@ function DriftPanel() {
               <td className="px-4 py-2.5">
                 <BandBadge band={d.status} label={d.status} />
               </td>
-              <td className="px-4 py-2.5 text-xs tnum text-ink-faint">{shortDate(d.computed_at)}</td>
+              <td className="px-4 py-2.5 text-xs tnum text-ink-faint">
+                {shortDate(d.computed_at, locale)}
+              </td>
             </tr>
           ))}
           {!drift.isLoading && (drift.data?.length ?? 0) === 0 && (
             <tr>
               <td colSpan={5} className="px-4 py-8 text-center text-ink-faint">
-                No drift metrics computed yet.
+                {t("governance.emptyDrift")}
               </td>
             </tr>
           )}
@@ -266,6 +276,7 @@ function DriftPanel() {
 }
 
 function AuditPanel() {
+  const { t, locale } = useLocale();
   const audit = useQuery({
     queryKey: ["audit"],
     queryFn: () => apiFetch<AuditEventOut[]>("/governance/audit?limit=50"),
@@ -273,7 +284,11 @@ function AuditPanel() {
 
   if (audit.error) {
     const forbidden = audit.error instanceof ApiError && audit.error.status === 403;
-    return <ErrorNote>{forbidden ? "Requires the approver role." : "Could not load the audit trail."}</ErrorNote>;
+    return (
+      <ErrorNote>
+        {forbidden ? t("governance.errorAuditForbidden") : t("governance.errorAudit")}
+      </ErrorNote>
+    );
   }
 
   return (
@@ -281,10 +296,10 @@ function AuditPanel() {
       <table className="w-full text-sm">
         <thead className="border-b border-surface-border bg-surface-sunken text-left text-xs text-ink-muted">
           <tr>
-            <th className="px-4 py-2 font-medium">When</th>
-            <th className="px-4 py-2 font-medium">Actor</th>
-            <th className="px-4 py-2 font-medium">Event</th>
-            <th className="px-4 py-2 font-medium">Entity</th>
+            <th className="px-4 py-2 font-medium">{t("governance.colWhen")}</th>
+            <th className="px-4 py-2 font-medium">{t("governance.colActor")}</th>
+            <th className="px-4 py-2 font-medium">{t("governance.colEvent")}</th>
+            <th className="px-4 py-2 font-medium">{t("governance.colEntity")}</th>
           </tr>
         </thead>
         <tbody className="divide-y divide-surface-border">
@@ -297,7 +312,9 @@ function AuditPanel() {
           )}
           {(audit.data ?? []).map((e) => (
             <tr key={e.event_id}>
-              <td className="px-4 py-2 text-xs tnum text-ink-faint">{shortDate(e.occurred_at)}</td>
+              <td className="px-4 py-2 text-xs tnum text-ink-faint">
+                {shortDate(e.occurred_at, locale)}
+              </td>
               <td className="px-4 py-2 text-ink-muted">
                 {e.actor} <span className="text-ink-faint">· {e.actor_role}</span>
               </td>

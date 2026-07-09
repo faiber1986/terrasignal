@@ -4,11 +4,46 @@
 
 :root {
   color-scheme: light;
+
+  --color-ink: 15 23 42;
+  --color-ink-muted: 71 85 105;
+  --color-ink-faint: 148 163 184;
+
+  --color-surface: 255 255 255;
+  --color-surface-sunken: 248 250 252;
+  --color-surface-border: 226 232 240;
+
+  --color-brand: 14 116 144;
+  --color-brand-dark: 21 94 117;
+
+  --color-band-green: 21 128 61;
+  --color-band-amber: 180 83 9;
+  --color-band-red: 185 28 28;
+}
+
+.dark {
+  color-scheme: dark;
+
+  --color-ink: 241 245 249;
+  --color-ink-muted: 148 163 184;
+  --color-ink-faint: 100 116 139;
+
+  --color-surface: 30 41 59;
+  --color-surface-sunken: 15 23 42;
+  --color-surface-border: 51 65 85;
+
+  --color-brand: 34 184 209;
+  --color-brand-dark: 8 145 178;
+
+  --color-band-green: 34 197 94;
+  --color-band-amber: 245 158 11;
+  --color-band-red: 239 68 68;
 }
 
 body {
   @apply bg-surface-sunken text-ink antialiased;
   font-feature-settings: "tnum" 1;
+  transition: background-color 0.15s ease, color 0.15s ease;
 }
 
 /* Tabular numbers everywhere money or metrics are shown. */

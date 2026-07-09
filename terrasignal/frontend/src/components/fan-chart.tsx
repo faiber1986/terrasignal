@@ -1,4 +1,11 @@
+"use client";
+
 import { rentPsf } from "@/lib/format";
+import { useLocale } from "@/lib/i18n";
+import { useTheme } from "@/lib/theme";
+
+const P50_COLOR = { light: "#0e7490", dark: "#22b8d1" };
+const IN_PLACE_COLOR = { light: "#475569", dark: "#94a3b8" };
 
 /** Horizontal range plot: the p10–p90 forecast band with the p50 estimate and
  * the in-place rent marked. A "fan" at a single renewal horizon. */
@@ -13,6 +20,8 @@ export function FanChart({
   p90: number;
   current: number;
 }) {
+  const { t } = useLocale();
+  const { theme } = useTheme();
   const lo = Math.min(p10, current);
   const hi = Math.max(p90, current);
   const pad = (hi - lo) * 0.12 || 1;
@@ -31,9 +40,21 @@ export function FanChart({
           style={{ left: `${x(p10)}%`, width: `${x(p90) - x(p10)}%` }}
         />
         {/* p50 marker */}
-        <Marker pos={x(p50)} color="#0e7490" label="p50" labelText={rentPsf(p50)} emphasize />
+        <Marker
+          pos={x(p50)}
+          color={P50_COLOR[theme]}
+          label="p50"
+          labelText={rentPsf(p50)}
+          emphasize
+        />
         {/* current rent marker */}
-        <Marker pos={x(current)} color="#475569" label="in-place" labelText={rentPsf(current)} below />
+        <Marker
+          pos={x(current)}
+          color={IN_PLACE_COLOR[theme]}
+          label={t("pricing.metricInPlace")}
+          labelText={rentPsf(current)}
+          below
+        />
       </div>
       <div className="flex justify-between text-[11px] tnum text-ink-faint">
         <span>{rentPsf(p10)} (p10)</span>

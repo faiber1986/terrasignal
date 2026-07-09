@@ -2,6 +2,8 @@
 
 **CRE Rent Forecasting & Tenant Default Risk Platform**
 
+> Part of the [Proyectos Inmobiliarios](../README.md) monorepo ([Español](../README.es.md)).
+
 TerraSignal is an end-to-end machine-learning platform for commercial real estate (CRE) portfolio management. It scores the default probability of every tenant with a calibrated XGBoost model, forecasts renewal rents with a gradient-boosted regression, and surfaces both results through a governed, audited web application. Every prediction ships with its SHAP feature drivers; every human decision is written to an immutable audit log; every model deployment requires a manual approval step.
 
 ---
@@ -249,6 +251,17 @@ Open your browser at **http://localhost:3001** and you should see the login page
 | `admin` | `demo` | Admin | Everything above + flip kill switch, approve models |
 
 JWT tokens expire after 12 hours and are stored in `localStorage`. Logging out clears the token.
+
+---
+
+## Appearance & Language
+
+Every authenticated page shows two controls in the top navigation bar, next to your name:
+
+- **EN / ES** — switches the entire UI (labels, tables, forms, error states, chart text) between English and Spanish. Dates localize to the selected language; dollar amounts always stay USD-formatted.
+- **Sun / moon icon** — toggles light/dark theme. Defaults to your OS preference on first visit.
+
+Both choices are saved to `localStorage` per browser and applied instantly, with no page reload and no flash of the wrong theme on the next visit.
 
 ---
 

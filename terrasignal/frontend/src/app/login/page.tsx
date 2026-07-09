@@ -6,20 +6,22 @@ import { useEffect, useState } from "react";
 import { Button, Card, CardBody, ErrorNote, Input, Label } from "@/components/ui/primitives";
 import { ApiError } from "@/lib/api/client";
 import { useAuth } from "@/lib/auth";
-
-const DEMO_USERS = [
-  { username: "ana.analyst", role: "Analyst — scores & overrides" },
-  { username: "alex.approver", role: "Approver — model approvals, audit" },
-  { username: "admin", role: "Admin — kill switch" },
-];
+import { useLocale } from "@/lib/i18n";
 
 export default function LoginPage() {
   const { user, ready, login } = useAuth();
+  const { t } = useLocale();
   const router = useRouter();
   const [username, setUsername] = useState("ana.analyst");
   const [password, setPassword] = useState("demo");
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+
+  const DEMO_USERS = [
+    { username: "ana.analyst", role: t("login.demoAnalyst") },
+    { username: "alex.approver", role: t("login.demoApprover") },
+    { username: "admin", role: t("login.demoAdmin") },
+  ];
 
   useEffect(() => {
     if (ready && user) router.replace("/dashboard");
@@ -33,7 +35,7 @@ export default function LoginPage() {
       await login(username, password);
       router.replace("/dashboard");
     } catch (err) {
-      setError(err instanceof ApiError ? err.message : "Sign-in failed");
+      setError(err instanceof ApiError ? err.message : t("login.signInFailed"));
     } finally {
       setBusy(false);
     }
@@ -47,13 +49,13 @@ export default function LoginPage() {
             TS
           </div>
           <h1 className="text-lg font-semibold text-ink">TerraSignal</h1>
-          <p className="text-sm text-ink-muted">CRE rent forecasting & tenant risk</p>
+          <p className="text-sm text-ink-muted">{t("login.tagline")}</p>
         </div>
         <Card>
           <CardBody>
             <form onSubmit={onSubmit} className="space-y-3">
               <div>
-                <Label htmlFor="username">Username</Label>
+                <Label htmlFor="username">{t("login.username")}</Label>
                 <Input
                   id="username"
                   value={username}
@@ -63,7 +65,7 @@ export default function LoginPage() {
                 />
               </div>
               <div>
-                <Label htmlFor="password">Password</Label>
+                <Label htmlFor="password">{t("login.password")}</Label>
                 <Input
                   id="password"
                   type="password"
@@ -75,13 +77,13 @@ export default function LoginPage() {
               </div>
               {error && <ErrorNote>{error}</ErrorNote>}
               <Button type="submit" disabled={busy} className="w-full">
-                {busy ? "Signing in…" : "Sign in"}
+                {busy ? t("login.signingIn") : t("login.signIn")}
               </Button>
             </form>
           </CardBody>
         </Card>
         <div className="mt-4 space-y-1 rounded-md border border-surface-border bg-surface p-3 text-xs text-ink-muted">
-          <p className="font-medium text-ink">Demo users (password: demo)</p>
+          <p className="font-medium text-ink">{t("login.demoUsers")}</p>
           {DEMO_USERS.map((u) => (
             <button
               key={u.username}

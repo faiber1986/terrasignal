@@ -7,6 +7,7 @@ import { PageHeader, PageShell } from "@/components/page-shell";
 import { Card, CardBody, CardHeader, CardTitle, ErrorNote, Skeleton } from "@/components/ui/primitives";
 import { apiFetch, ApiError, type Schemas } from "@/lib/api/client";
 import { pct, shortDate, usdCompact } from "@/lib/format";
+import { useLocale } from "@/lib/i18n";
 
 type PortfolioSummary = Schemas["PortfolioSummary"];
 
@@ -19,6 +20,7 @@ export default function DashboardPage() {
 }
 
 function Dashboard() {
+  const { t, locale } = useLocale();
   const { data, isLoading, error } = useQuery({
     queryKey: ["portfolio-summary"],
     queryFn: () => apiFetch<PortfolioSummary>("/portfolio/summary"),
@@ -27,42 +29,53 @@ function Dashboard() {
   return (
     <>
       <PageHeader
-        title="Portfolio"
-        subtitle={data ? `As of ${shortDate(data.as_of)} · ${data.n_properties} properties` : undefined}
+        title={t("dashboard.title")}
+        subtitle={
+          data
+            ? t("dashboard.subtitle", {
+                date: shortDate(data.as_of, locale),
+                count: data.n_properties,
+              })
+            : undefined
+        }
       />
 
-      {error && <ErrorNote>{describe(error)}</ErrorNote>}
+      {error && <ErrorNote>{describe(error, t)}</ErrorNote>}
 
       <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
         <Kpi
-          label="NOI at risk (annual)"
+          label={t("dashboard.noiAtRisk")}
           value={data ? usdCompact(data.noi_at_risk_annual) : undefined}
-          hint="Watchlist tenants' in-place rent"
+          hint={t("dashboard.noiAtRiskHint")}
           tone="risk"
         />
         <Kpi
-          label="Watchlist tenants"
+          label={t("dashboard.watchlistTenants")}
           value={data ? data.watchlist_count.toString() : undefined}
-          hint={data ? `Avg PD ${pct(data.avg_pd)}` : undefined}
+          hint={data ? t("dashboard.watchlistHint", { pct: pct(data.avg_pd) }) : undefined}
           tone="risk"
         />
         <Kpi
-          label="Renewal upside (annual)"
+          label={t("dashboard.renewalUpside")}
           value={data ? usdCompact(data.renewal_upside_annual) : undefined}
-          hint="If priced units renew at p50"
+          hint={t("dashboard.renewalUpsideHint")}
           tone="up"
         />
         <Kpi
-          label="Active leases"
+          label={t("dashboard.activeLeases")}
           value={data ? data.active_leases.toLocaleString() : undefined}
-          hint={data ? `${(data.total_rsf / 1_000_000).toFixed(1)}M RSF` : undefined}
+          hint={
+            data
+              ? t("dashboard.activeLeasesHint", { rsf: (data.total_rsf / 1_000_000).toFixed(1) })
+              : undefined
+          }
         />
       </div>
 
       <div className="mt-4 grid grid-cols-1 gap-4 lg:grid-cols-2">
         <Card>
           <CardHeader>
-            <CardTitle>Tenant risk distribution</CardTitle>
+            <CardTitle>{t("dashboard.riskDistribution")}</CardTitle>
           </CardHeader>
           <CardBody>
             {data ? (
@@ -74,7 +87,7 @@ function Dashboard() {
         </Card>
         <Card>
           <CardHeader>
-            <CardTitle>Lease expiration wall</CardTitle>
+            <CardTitle>{t("dashboard.expirationWall")}</CardTitle>
           </CardHeader>
           <CardBody>
             {data ? (
@@ -86,7 +99,7 @@ function Dashboard() {
         </Card>
       </div>
 
-      {isLoading && <p className="mt-4 text-sm text-ink-faint">Loading portfolio…</p>}
+      {isLoading && <p className="mt-4 text-sm text-ink-faint">{t("dashboard.loadingPortfolio")}</p>}
     </>
   );
 }
@@ -119,12 +132,12 @@ function Kpi({
   );
 }
 
-function describe(error: unknown): string {
+function describe(error: unknown, t: (key: string) => string): string {
   if (error instanceof ApiError) {
     if (error.status === 404 || error.status === 500) {
-      return "No portfolio data yet — run the demo seed + batch scoring, then refresh.";
+      return t("dashboard.errorNoData");
     }
     return error.message;
   }
-  return "Failed to load portfolio.";
+  return t("dashboard.errorGeneric");
 }

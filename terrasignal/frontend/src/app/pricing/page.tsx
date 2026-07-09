@@ -19,6 +19,7 @@ import {
 } from "@/components/ui/primitives";
 import { apiFetch, type Schemas } from "@/lib/api/client";
 import { pct, rentPsf, shortDate } from "@/lib/format";
+import { useLocale } from "@/lib/i18n";
 import { cn } from "@/lib/utils";
 
 type RentQueueItem = Schemas["RentQueueItem"];
@@ -34,6 +35,7 @@ export default function PricingPage() {
 }
 
 function PricingWorkbench() {
+  const { t, locale } = useLocale();
   const [selected, setSelected] = useState<string | null>(null);
 
   const queue = useQuery({
@@ -53,18 +55,15 @@ function PricingWorkbench() {
 
   return (
     <>
-      <PageHeader
-        title="Lease Pricing"
-        subtitle="Renewal rent forecast with comps, drivers, and a grounded rationale memo"
-      />
+      <PageHeader title={t("pricing.title")} subtitle={t("pricing.subtitle")} />
 
-      {queue.error && <ErrorNote>Could not load the renewal queue — seed + score first.</ErrorNote>}
+      {queue.error && <ErrorNote>{t("pricing.errorQueue")}</ErrorNote>}
 
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-[20rem_1fr]">
         {/* Unit picker */}
         <Card className="overflow-hidden">
           <CardHeader>
-            <CardTitle>Upcoming renewals</CardTitle>
+            <CardTitle>{t("pricing.upcomingRenewals")}</CardTitle>
           </CardHeader>
           <ul className="max-h-[36rem] divide-y divide-surface-border overflow-y-auto">
             {queue.isLoading &&
@@ -87,13 +86,19 @@ function PricingWorkbench() {
                     <UpsidePill pct={u.upside_pct} />
                   </div>
                   <div className="mt-0.5 text-xs text-ink-faint">
-                    {u.unit_id} · {u.submarket} · exp {shortDate(u.lease_expiration)}
+                    {t("pricing.unitMeta", {
+                      unitId: u.unit_id,
+                      submarket: u.submarket,
+                      date: shortDate(u.lease_expiration, locale),
+                    })}
                   </div>
                 </button>
               </li>
             ))}
             {!queue.isLoading && (queue.data?.length ?? 0) === 0 && (
-              <li className="px-4 py-8 text-center text-sm text-ink-faint">No renewals queued.</li>
+              <li className="px-4 py-8 text-center text-sm text-ink-faint">
+                {t("pricing.emptyRenewals")}
+              </li>
             )}
           </ul>
         </Card>
@@ -103,7 +108,7 @@ function PricingWorkbench() {
           {selected === null ? (
             <Card>
               <CardBody className="py-16 text-center text-sm text-ink-faint">
-                Select a unit to forecast its renewal rent.
+                {t("pricing.selectUnit")}
               </CardBody>
             </Card>
           ) : forecast.isLoading ? (
@@ -113,7 +118,7 @@ function PricingWorkbench() {
               </CardBody>
             </Card>
           ) : forecast.error ? (
-            <ErrorNote>This unit has no active lease to renew.</ErrorNote>
+            <ErrorNote>{t("pricing.errorNoLease")}</ErrorNote>
           ) : forecast.data ? (
             <ForecastDetail data={forecast.data} />
           ) : null}
@@ -124,6 +129,7 @@ function PricingWorkbench() {
 }
 
 function ForecastDetail({ data }: { data: RentForecastResponse }) {
+  const { t, locale } = useLocale();
   const upside = data.current_rent_psf ? data.p50 / data.current_rent_psf - 1 : 0;
   return (
     <>
@@ -135,21 +141,24 @@ function ForecastDetail({ data }: { data: RentForecastResponse }) {
         </CardHeader>
         <CardBody>
           <div className="mb-4 flex flex-wrap items-baseline gap-x-6 gap-y-1">
-            <Metric label="p50 renewal" value={rentPsf(data.p50)} emphasize />
-            <Metric label="in-place" value={rentPsf(data.current_rent_psf)} />
-            <Metric label="upside" value={pct(upside)} tone={upside >= 0 ? "up" : "down"} />
-            <Metric label="submarket comp (6m)" value={rentPsf(data.comp_median_rent_6m)} />
+            <Metric label={t("pricing.metricP50")} value={rentPsf(data.p50)} emphasize />
+            <Metric label={t("pricing.metricInPlace")} value={rentPsf(data.current_rent_psf)} />
+            <Metric
+              label={t("pricing.metricUpside")}
+              value={pct(upside)}
+              tone={upside >= 0 ? "up" : "down"}
+            />
+            <Metric label={t("pricing.metricComp")} value={rentPsf(data.comp_median_rent_6m)} />
           </div>
-          <FanChart
-            p10={data.p10}
-            p50={data.p50}
-            p90={data.p90}
-            current={data.current_rent_psf}
-          />
+          <FanChart p10={data.p10} p50={data.p50} p90={data.p90} current={data.current_rent_psf} />
           <p className="mt-3 text-xs text-ink-faint">
-            {data.asset_class} · {data.submarket} · {data.unit_rsf.toLocaleString()} RSF · model v
-            {data.model_version}
-            {data.baseline_mode && " · baseline heuristic"}
+            {t("pricing.footerMeta", {
+              assetClass: data.asset_class,
+              submarket: data.submarket,
+              rsf: data.unit_rsf.toLocaleString(),
+              version: data.model_version,
+            })}
+            {data.baseline_mode && t("pricing.footerBaseline")}
           </p>
         </CardBody>
       </Card>
@@ -157,7 +166,7 @@ function ForecastDetail({ data }: { data: RentForecastResponse }) {
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
         <Card>
           <CardHeader>
-            <CardTitle>What drives the estimate</CardTitle>
+            <CardTitle>{t("pricing.driversTitle")}</CardTitle>
           </CardHeader>
           <CardBody>
             <ShapDrivers drivers={data.drivers} />
@@ -166,23 +175,23 @@ function ForecastDetail({ data }: { data: RentForecastResponse }) {
 
         <Card>
           <CardHeader>
-            <CardTitle>Nearest comps</CardTitle>
+            <CardTitle>{t("pricing.compsTitle")}</CardTitle>
           </CardHeader>
           <CardBody className="p-0">
             <table className="w-full text-xs">
               <thead className="border-b border-surface-border bg-surface-sunken text-left text-ink-muted">
                 <tr>
-                  <th className="px-3 py-2 font-medium">Signed</th>
-                  <th className="px-3 py-2 text-right font-medium">Rent</th>
-                  <th className="px-3 py-2 text-right font-medium">Term</th>
-                  <th className="px-3 py-2 text-right font-medium">TI</th>
-                  <th className="px-3 py-2 text-right font-medium">Free</th>
+                  <th className="px-3 py-2 font-medium">{t("pricing.colSigned")}</th>
+                  <th className="px-3 py-2 text-right font-medium">{t("pricing.colRent")}</th>
+                  <th className="px-3 py-2 text-right font-medium">{t("pricing.colTerm")}</th>
+                  <th className="px-3 py-2 text-right font-medium">{t("pricing.colTi")}</th>
+                  <th className="px-3 py-2 text-right font-medium">{t("pricing.colFree")}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-surface-border">
                 {data.comps.map((c) => (
                   <tr key={c.comp_id}>
-                    <td className="px-3 py-1.5 tnum text-ink-muted">{shortDate(c.signed_date)}</td>
+                    <td className="px-3 py-1.5 tnum text-ink-muted">{shortDate(c.signed_date, locale)}</td>
                     <td className="px-3 py-1.5 text-right tnum">{rentPsf(c.rent_psf)}</td>
                     <td className="px-3 py-1.5 text-right tnum">{c.term_months}mo</td>
                     <td className="px-3 py-1.5 text-right tnum">${c.ti_allowance_psf.toFixed(0)}</td>
@@ -192,7 +201,7 @@ function ForecastDetail({ data }: { data: RentForecastResponse }) {
                 {data.comps.length === 0 && (
                   <tr>
                     <td colSpan={5} className="px-3 py-4 text-center text-ink-faint">
-                      Thin submarket — no recent comps.
+                      {t("pricing.emptyComps")}
                     </td>
                   </tr>
                 )}
@@ -206,7 +215,7 @@ function ForecastDetail({ data }: { data: RentForecastResponse }) {
 
       <Card>
         <CardHeader>
-          <CardTitle>Pricing decision</CardTitle>
+          <CardTitle>{t("pricing.decisionTitle")}</CardTitle>
         </CardHeader>
         <CardBody>
           <FeedbackActions
@@ -221,6 +230,7 @@ function ForecastDetail({ data }: { data: RentForecastResponse }) {
 }
 
 function RationaleCard({ predictionId }: { predictionId: string }) {
+  const { t } = useLocale();
   const memo = useMutation({
     mutationFn: () =>
       apiFetch<RationaleResponse>(`/forecasts/${predictionId}/rationale`, { method: "POST" }),
@@ -229,9 +239,13 @@ function RationaleCard({ predictionId }: { predictionId: string }) {
   return (
     <Card>
       <CardHeader className="flex items-center justify-between">
-        <CardTitle>Rationale memo</CardTitle>
+        <CardTitle>{t("pricing.rationaleTitle")}</CardTitle>
         <Button size="sm" variant="secondary" onClick={() => memo.mutate()} disabled={memo.isPending}>
-          {memo.isPending ? "Generating…" : memo.data ? "Regenerate" : "Generate memo"}
+          {memo.isPending
+            ? t("pricing.generating")
+            : memo.data
+              ? t("pricing.regenerate")
+              : t("pricing.generateMemo")}
         </Button>
       </CardHeader>
       <CardBody>
@@ -241,17 +255,14 @@ function RationaleCard({ predictionId }: { predictionId: string }) {
               <Tag>{memo.data.label}</Tag>
               <Tag>{memo.data.backend}</Tag>
               <Tag className={memo.data.guard_passed ? "text-band-green" : "text-band-red"}>
-                numeric guard {memo.data.guard_passed ? "passed" : "failed"}
+                {memo.data.guard_passed ? t("pricing.guardPassed") : t("pricing.guardFailed")}
               </Tag>
-              {memo.data.fallback_used && <Tag>template fallback</Tag>}
+              {memo.data.fallback_used && <Tag>{t("pricing.templateFallback")}</Tag>}
             </div>
             <p className="whitespace-pre-wrap text-sm leading-relaxed text-ink">{memo.data.memo}</p>
           </>
         ) : (
-          <p className="text-sm text-ink-faint">
-            Generate a grounded narrative — the model verbalizes the numbers above; a post-check
-            rejects any figure not present in the forecast payload.
-          </p>
+          <p className="text-sm text-ink-faint">{t("pricing.rationalePlaceholder")}</p>
         )}
       </CardBody>
     </Card>

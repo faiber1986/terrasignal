@@ -5,19 +5,29 @@ import { useState } from "react";
 
 import { Button, ErrorNote, Label } from "@/components/ui/primitives";
 import { apiFetch, ApiError, type Schemas } from "@/lib/api/client";
+import { useLocale } from "@/lib/i18n";
 
 type FeedbackResponse = Schemas["FeedbackResponse"];
 type FeedbackRequest = Schemas["FeedbackRequest"];
 
 // Mirrors the server-side allowlist in feedback.py — the server re-validates.
-const REASON_CODES: { value: string; label: string }[] = [
-  { value: "market_knowledge", label: "Market knowledge" },
-  { value: "tenant_relationship", label: "Tenant relationship" },
-  { value: "data_quality_concern", label: "Data quality concern" },
-  { value: "strategic_decision", label: "Strategic decision" },
-  { value: "model_distrust", label: "Model distrust" },
-  { value: "other", label: "Other" },
-];
+const REASON_CODE_VALUES = [
+  "market_knowledge",
+  "tenant_relationship",
+  "data_quality_concern",
+  "strategic_decision",
+  "model_distrust",
+  "other",
+] as const;
+
+const REASON_LABEL_KEYS: Record<(typeof REASON_CODE_VALUES)[number], string> = {
+  market_knowledge: "feedback.reasonMarket",
+  tenant_relationship: "feedback.reasonRelationship",
+  data_quality_concern: "feedback.reasonDataQuality",
+  strategic_decision: "feedback.reasonStrategic",
+  model_distrust: "feedback.reasonDistrust",
+  other: "feedback.reasonOther",
+};
 
 /** Accept / override-with-reason. Overrides require a structured reason code +
  * free text; both actions write to feedback + audit (§8.3). On success the
@@ -31,9 +41,12 @@ export function FeedbackActions({
   invalidateKeys?: unknown[][];
   overrideValue?: Record<string, unknown>;
 }) {
+  const { t } = useLocale();
   const qc = useQueryClient();
   const [mode, setMode] = useState<"idle" | "override">("idle");
-  const [reasonCode, setReasonCode] = useState(REASON_CODES[0]!.value);
+  const [reasonCode, setReasonCode] = useState<(typeof REASON_CODE_VALUES)[number]>(
+    REASON_CODE_VALUES[0],
+  );
   const [comment, setComment] = useState("");
   const [done, setDone] = useState<"accept" | "override" | null>(null);
 
@@ -50,7 +63,7 @@ export function FeedbackActions({
   if (done) {
     return (
       <p className="text-sm text-band-green">
-        Recorded {done === "accept" ? "acceptance" : "override"} — written to the audit trail.
+        {done === "accept" ? t("feedback.recordedAccept") : t("feedback.recordedOverride")}
       </p>
     );
   }
@@ -64,38 +77,38 @@ export function FeedbackActions({
             onClick={() => mutation.mutate({ prediction_id: predictionId, action: "accept" })}
             disabled={mutation.isPending}
           >
-            Accept
+            {t("feedback.accept")}
           </Button>
           <Button size="sm" variant="secondary" onClick={() => setMode("override")}>
-            Override…
+            {t("feedback.override")}
           </Button>
         </div>
       ) : (
         <div className="space-y-2 rounded-md border border-surface-border bg-surface-sunken p-3">
           <div>
-            <Label htmlFor="reason">Reason code (required)</Label>
+            <Label htmlFor="reason">{t("feedback.reasonCodeLabel")}</Label>
             <select
               id="reason"
               value={reasonCode}
-              onChange={(e) => setReasonCode(e.target.value)}
+              onChange={(e) => setReasonCode(e.target.value as (typeof REASON_CODE_VALUES)[number])}
               className="mt-1 w-full rounded-md border border-surface-border bg-surface px-3 py-2 text-sm"
             >
-              {REASON_CODES.map((r) => (
-                <option key={r.value} value={r.value}>
-                  {r.label}
+              {REASON_CODE_VALUES.map((value) => (
+                <option key={value} value={value}>
+                  {t(REASON_LABEL_KEYS[value])}
                 </option>
               ))}
             </select>
           </div>
           <div>
-            <Label htmlFor="comment">Comment</Label>
+            <Label htmlFor="comment">{t("feedback.commentLabel")}</Label>
             <textarea
               id="comment"
               value={comment}
               onChange={(e) => setComment(e.target.value)}
               rows={2}
               className="mt-1 w-full rounded-md border border-surface-border bg-surface px-3 py-2 text-sm"
-              placeholder="What does the model miss here?"
+              placeholder={t("feedback.commentPlaceholder")}
             />
           </div>
           <div className="flex gap-2">
@@ -113,17 +126,17 @@ export function FeedbackActions({
                 })
               }
             >
-              Submit override
+              {t("feedback.submitOverride")}
             </Button>
             <Button size="sm" variant="ghost" onClick={() => setMode("idle")}>
-              Cancel
+              {t("feedback.cancel")}
             </Button>
           </div>
         </div>
       )}
       {mutation.error && (
         <ErrorNote>
-          {mutation.error instanceof ApiError ? mutation.error.message : "Failed to record feedback"}
+          {mutation.error instanceof ApiError ? mutation.error.message : t("feedback.errorGeneric")}
         </ErrorNote>
       )}
     </div>

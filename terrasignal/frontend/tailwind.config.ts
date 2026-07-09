@@ -1,29 +1,37 @@
 import type { Config } from "tailwindcss";
 
+// Colors are CSS variables (see globals.css :root / .dark) so every token
+// flips with the `dark` class — rgb(var(...) / <alpha-value>) keeps Tailwind's
+// opacity modifiers (e.g. bg-band-green/10) working under dark mode too.
+function themeColor(name: string) {
+  return `rgb(var(--color-${name}) / <alpha-value>)`;
+}
+
 const config: Config = {
+  darkMode: "class",
   content: ["./src/**/*.{ts,tsx}"],
   theme: {
     extend: {
       colors: {
         // Risk bands — used consistently across queue, dashboard, drill-downs.
         band: {
-          green: "#15803d",
-          amber: "#b45309",
-          red: "#b91c1c",
+          green: themeColor("band-green"),
+          amber: themeColor("band-amber"),
+          red: themeColor("band-red"),
         },
         ink: {
-          DEFAULT: "#0f172a",
-          muted: "#475569",
-          faint: "#94a3b8",
+          DEFAULT: themeColor("ink"),
+          muted: themeColor("ink-muted"),
+          faint: themeColor("ink-faint"),
         },
         surface: {
-          DEFAULT: "#ffffff",
-          sunken: "#f8fafc",
-          border: "#e2e8f0",
+          DEFAULT: themeColor("surface"),
+          sunken: themeColor("surface-sunken"),
+          border: themeColor("surface-border"),
         },
         brand: {
-          DEFAULT: "#0e7490",
-          dark: "#155e75",
+          DEFAULT: themeColor("brand"),
+          dark: themeColor("brand-dark"),
         },
       },
       fontFamily: {

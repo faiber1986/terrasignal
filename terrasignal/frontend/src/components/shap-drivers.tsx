@@ -1,4 +1,5 @@
 import type { Schemas } from "@/lib/api/client";
+import { useLocale } from "@/lib/i18n";
 import { cn } from "@/lib/utils";
 
 type ShapDriver = Schemas["ShapDriverOut"];
@@ -7,8 +8,9 @@ type ShapDriver = Schemas["ShapDriverOut"];
  * Bars are scaled to the largest absolute contribution in the set; red pushes
  * the prediction up (more risk / higher rent), blue pulls it down. */
 export function ShapDrivers({ drivers }: { drivers: ShapDriver[] }) {
+  const { t } = useLocale();
   if (drivers.length === 0) {
-    return <p className="text-sm text-ink-faint">No driver attribution available.</p>;
+    return <p className="text-sm text-ink-faint">{t("shap.empty")}</p>;
   }
   const max = Math.max(...drivers.map((d) => Math.abs(d.shap))) || 1;
 
