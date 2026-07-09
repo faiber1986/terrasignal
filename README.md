@@ -1,32 +1,31 @@
-# Proyectos Inmobiliarios
+# TerraSignal
+
+**CRE Rent Forecasting & Tenant Default Risk Platform**
 
 **Español disponible:** [README.es.md](README.es.md)
 
-A monorepo for two CRE (commercial real estate) data platforms, built around one shared engineering discipline: **LLMs interpret, they never compute financial math**, and every model output that reaches a user is traceable back to a model version, a data snapshot, and — where it matters — a human approval.
+TerraSignal is the project in this repository: a CRE (commercial real estate) data platform that scores tenant default risk and forecasts renewal rents, built around one engineering discipline — **LLMs interpret, they never compute financial math** — and every model output that reaches a user is traceable back to a model version, a data snapshot, and — where it matters — a human approval.
 
-| Project | Status | What it does |
-|---|---|---|
-| **[TerraSignal](terrasignal/README.md)** | Built — core ML loop + product UI | CRE rent forecasting & tenant default-risk scoring, with SHAP explanations, an audited override workflow, and a governance console (kill switch, model registry, drift monitor). |
-| **LedgerLens** | Design only (see [project-2 doc](project-2-agentic-lease-abstraction.md)) | Agentic lease abstraction — extracting structured terms from lease PDFs with citation-checked LLM extraction and a CAM reconciliation agent. Not yet implemented. |
-
-For the full setup guide, screenshots, and user walkthrough of the running application, see **[terrasignal/README.md](terrasignal/README.md)**. This file covers the monorepo as a whole.
+For the full setup guide, screenshots, and user walkthrough of the running application, see **[terrasignal/README.md](terrasignal/README.md)**. This file is the repo-root overview.
 
 ---
 
-## What's here
+## Repo layout
+
+This repo is structured as a monorepo in anticipation of a second project, **LedgerLens** (agentic lease abstraction), which today is **design-only** — see [project-2-agentic-lease-abstraction.md](project-2-agentic-lease-abstraction.md). It has no code yet; `terrasignal/` is the only implemented project.
 
 ```
 Proyectos inmobiliarios/
-├── CLAUDE.md                          ← shared engineering conventions (both projects)
-├── project-1-cre-rent-risk-platform.md   ← TerraSignal design doc
+├── CLAUDE.md                              ← shared engineering conventions
+├── project-1-cre-rent-risk-platform.md    ← TerraSignal design doc
 ├── project-2-agentic-lease-abstraction.md ← LedgerLens design doc (not yet built)
-├── docker-compose.yml                 ← Postgres 16 (local dev)
-├── pyproject.toml / uv.lock           ← Python workspace (uv), one lockfile for the monorepo
-├── shared/                            ← cross-project code: core types, audit writer, DQ helpers
-└── terrasignal/                       ← Project 1: ML pipeline, FastAPI backend, Next.js frontend
+├── docker-compose.yml                     ← Postgres 16 (local dev)
+├── pyproject.toml / uv.lock               ← Python workspace (uv)
+├── shared/                                ← cross-project code: core types, audit writer, DQ helpers
+└── terrasignal/                           ← TerraSignal: ML pipeline, FastAPI backend, Next.js frontend
 ```
 
-`shared/` is the only code either project is allowed to import from one another through — `terrasignal/` and a future `ledgerlens/` never import each other directly.
+`shared/` exists so that a future `ledgerlens/` project could reuse core types, the audit writer, and DQ helpers without either project importing the other directly.
 
 ## Recently added: dark mode & bilingual UI
 
@@ -84,7 +83,7 @@ Open `http://localhost:3001` and sign in with one of the demo users listed on th
 | 1 | TerraSignal ML loop (features → risk scorer → registry → endpoint) | ✅ Done |
 | 2 | TerraSignal product (scoring API + UI, rent forecaster, pricing workbench) | ✅ Done |
 | 3 | MLOps backbone (drift → retrain automation, blue/green approval, governance console v1) | Partial — governance console (kill switch, registry, drift, audit) is live; automated retrain pipeline is not |
-| 4–6 | LedgerLens (document pipeline, agents, MLOps) | Not started — design doc only |
+| 4–6 | LedgerLens (document pipeline, agents, MLOps) | Not started — design doc only, no code in this repo yet |
 
 See [CLAUDE.md §6](CLAUDE.md#6-cross-repo-implementation-order) for the full phase breakdown.
 

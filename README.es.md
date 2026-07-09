@@ -1,32 +1,31 @@
-# Proyectos Inmobiliarios
+# TerraSignal
+
+**Plataforma de Pronóstico de Renta CRE y Riesgo de Incumplimiento de Inquilinos**
 
 **English available:** [README.md](README.md)
 
-Un monorepo para dos plataformas de datos de bienes raíces comerciales (CRE), construidas alrededor de una misma disciplina de ingeniería: **los LLM interpretan, nunca calculan matemática financiera**, y cada resultado de modelo que llega a un usuario es rastreable hasta una versión de modelo, una instantánea de datos y, cuando corresponde, una aprobación humana.
+TerraSignal es el proyecto de este repositorio: una plataforma de datos de bienes raíces comerciales (CRE) que calcula el riesgo de incumplimiento de inquilinos y pronostica rentas de renovación, construida alrededor de una disciplina de ingeniería — **los LLM interpretan, nunca calculan matemática financiera** — y cada resultado de modelo que llega a un usuario es rastreable hasta una versión de modelo, una instantánea de datos y, cuando corresponde, una aprobación humana.
 
-| Proyecto | Estado | Qué hace |
-|---|---|---|
-| **[TerraSignal](terrasignal/README.md)** | Construido — pipeline de ML principal + interfaz de producto | Pronóstico de renta CRE y puntaje de riesgo de incumplimiento de inquilinos, con explicaciones SHAP, un flujo de anulación auditado y una consola de gobernanza (interruptor de emergencia, registro de modelos, monitor de drift). |
-| **LedgerLens** | Solo diseño (ver [documento del proyecto 2](project-2-agentic-lease-abstraction.md)) | Abstracción agéntica de contratos de arrendamiento — extracción de términos estructurados de PDFs de contratos con extracción LLM verificada por citas y un agente de reconciliación CAM. Aún no implementado. |
-
-Para la guía completa de instalación, capturas de pantalla y recorrido de usuario de la aplicación en funcionamiento, consulta **[terrasignal/README.md](terrasignal/README.md)**. Este archivo cubre el monorepo en su conjunto.
+Para la guía completa de instalación, capturas de pantalla y recorrido de usuario de la aplicación en funcionamiento, consulta **[terrasignal/README.md](terrasignal/README.md)**. Este archivo es el resumen a nivel de repositorio.
 
 ---
 
-## Qué hay aquí
+## Estructura del repositorio
+
+Este repositorio está organizado como un monorepo previendo un segundo proyecto, **LedgerLens** (abstracción agéntica de contratos de arrendamiento), que hoy es **solo diseño** — ver [project-2-agentic-lease-abstraction.md](project-2-agentic-lease-abstraction.md). Todavía no tiene código; `terrasignal/` es el único proyecto implementado.
 
 ```
 Proyectos inmobiliarios/
-├── CLAUDE.md                          ← convenciones de ingeniería compartidas (ambos proyectos)
-├── project-1-cre-rent-risk-platform.md   ← documento de diseño de TerraSignal
+├── CLAUDE.md                              ← convenciones de ingeniería compartidas
+├── project-1-cre-rent-risk-platform.md    ← documento de diseño de TerraSignal
 ├── project-2-agentic-lease-abstraction.md ← documento de diseño de LedgerLens (aún no construido)
-├── docker-compose.yml                 ← Postgres 16 (desarrollo local)
-├── pyproject.toml / uv.lock           ← workspace de Python (uv), un solo lockfile para el monorepo
-├── shared/                            ← código compartido: tipos base, escritor de auditoría, ayudantes de DQ
-└── terrasignal/                       ← Proyecto 1: pipeline de ML, backend FastAPI, frontend Next.js
+├── docker-compose.yml                     ← Postgres 16 (desarrollo local)
+├── pyproject.toml / uv.lock               ← workspace de Python (uv)
+├── shared/                                ← código compartido: tipos base, escritor de auditoría, ayudantes de DQ
+└── terrasignal/                           ← TerraSignal: pipeline de ML, backend FastAPI, frontend Next.js
 ```
 
-`shared/` es el único código que ambos proyectos pueden importar entre sí — `terrasignal/` y un futuro `ledgerlens/` nunca se importan directamente.
+`shared/` existe para que un futuro proyecto `ledgerlens/` pueda reutilizar tipos base, el escritor de auditoría y los ayudantes de DQ sin que ambos proyectos se importen directamente entre sí.
 
 ## Novedades: modo oscuro e interfaz bilingüe
 
@@ -84,7 +83,7 @@ Abre `http://localhost:3001` e inicia sesión con uno de los usuarios de demostr
 | 1 | Ciclo de ML de TerraSignal (features → risk scorer → registro → endpoint) | ✅ Completo |
 | 2 | Producto TerraSignal (API de scoring + interfaz, pronosticador de renta, workbench de precios) | ✅ Completo |
 | 3 | Base de MLOps (drift → reentrenamiento automático, aprobación blue/green, consola de gobernanza v1) | Parcial — la consola de gobernanza (interruptor, registro, drift, auditoría) está en vivo; el pipeline de reentrenamiento automático no |
-| 4–6 | LedgerLens (pipeline de documentos, agentes, MLOps) | No iniciado — solo documento de diseño |
+| 4–6 | LedgerLens (pipeline de documentos, agentes, MLOps) | No iniciado — solo documento de diseño, sin código en este repositorio todavía |
 
 Consulta [CLAUDE.md §6](CLAUDE.md#6-cross-repo-implementation-order) para el desglose completo de fases.
 
