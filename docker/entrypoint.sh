@@ -51,17 +51,21 @@ PY
 
 if [ "$NEEDS_SEED" = "yes" ]; then
   log "empty database — running the seeding pipeline (this takes a few minutes) ..."
-  log "  1/6 generating the synthetic CRE portfolio"
+  log "  1/7 generating the synthetic CRE portfolio"
   python -m terrasignal.synth
-  log "  2/6 validating and loading through the DQ pipeline"
+  log "  2/7 validating and loading through the DQ pipeline"
   python -m terrasignal.ingestion
-  log "  3/6 training the tenant default risk scorer"
+  # Builds data/features/LATEST.json, which both trainers and batch_score read.
+  # Omitted from the README's step list; without it training dies on a missing file.
+  log "  3/7 building the point-in-time feature set"
+  python -m terrasignal.features.build
+  log "  4/7 training the tenant default risk scorer"
   python -m terrasignal.training.risk_scorer
-  log "  4/6 training the renewal rent forecaster"
+  log "  5/7 training the renewal rent forecaster"
   python -m terrasignal.training.rent_forecaster
-  log "  5/6 approving both models for serving"
+  log "  6/7 approving both models for serving"
   python -m terrasignal.training.registry
-  log "  6/6 batch scoring + drift baseline"
+  log "  7/7 batch scoring + drift baseline"
   python -m terrasignal.training.batch_score
   python -m terrasignal.training.drift || log "WARNING: drift step failed; continuing."
   log "seeding complete."

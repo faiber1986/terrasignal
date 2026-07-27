@@ -166,7 +166,18 @@ After ingestion you will have approximately:
 - 800 tenants with payment histories
 - ~1,400 active leases
 
-#### 4b. Train the Risk Scorer
+#### 4b. Build the feature set
+
+```bash
+uv run python -m terrasignal.features.build
+```
+
+Computes the point-in-time feature set from the ingested snapshot and writes
+`terrasignal/data/features/LATEST.json`. Both trainers and `batch_score` read
+this file, so skipping this step makes the next command fail with
+`FileNotFoundError: .../data/features/LATEST.json`.
+
+#### 4c. Train the Risk Scorer
 
 ```bash
 uv run python -m terrasignal.training.risk_scorer
@@ -174,7 +185,7 @@ uv run python -m terrasignal.training.risk_scorer
 
 Trains an XGBoost classifier predicting 12-month default probability (PD). Uses time-based train/test splits. Reports PR-AUC and Brier score. Artifacts are saved to `terrasignal/artifacts/`.
 
-#### 4c. Train the Rent Forecaster
+#### 4d. Train the Rent Forecaster
 
 ```bash
 uv run python -m terrasignal.training.rent_forecaster
@@ -182,7 +193,7 @@ uv run python -m terrasignal.training.rent_forecaster
 
 Trains an XGBoost regressor predicting market rent at renewal. Reports MAPE on a held-out time split. Artifacts saved to `terrasignal/artifacts/`.
 
-#### 4d. Approve both models
+#### 4e. Approve both models
 
 Models start in `PendingManualApproval` status. Approve them for serving:
 
@@ -192,7 +203,7 @@ uv run python -m terrasignal.training.registry
 
 This promotes the latest version of each model to `Approved` status in `model_registry`.
 
-#### 4e. Run batch scoring
+#### 4f. Run batch scoring
 
 ```bash
 uv run python -m terrasignal.training.batch_score
@@ -200,7 +211,7 @@ uv run python -m terrasignal.training.batch_score
 
 Scores every tenant (risk) and every unit with an expiring lease (rent). Results are written to the `predictions` table with full SHAP drivers.
 
-#### 4f. Compute drift metrics
+#### 4g. Compute drift metrics
 
 ```bash
 uv run python -m terrasignal.training.drift
@@ -208,7 +219,7 @@ uv run python -m terrasignal.training.drift
 
 Computes PSI (Population Stability Index) for all model features, comparing training distribution vs. current batch. Results land in `drift_metrics`.
 
-After completing all six steps, the application is ready to serve live data.
+After completing all seven steps, the application is ready to serve live data.
 
 ### 5. Start the Backend API
 
