@@ -15,13 +15,14 @@ Each trap maps to a specific DQ rule and layer:
 
 from __future__ import annotations
 
-from datetime import date, timedelta
+from datetime import timedelta
 
 import numpy as np
 import polars as pl
 from pydantic import BaseModel
 
 from terrasignal.synth.generator import Portfolio
+from terrasignal.synth.markets import OBS_END
 
 
 class DirtManifest(BaseModel):
@@ -146,8 +147,13 @@ def inject(portfolio: Portfolio, rate: float = 0.006, seed: int = 1337) -> DirtM
         ti_allowance_psf=pl.when(pl.col("comp_id").is_in(manifest.comps_negative_ti))
         .then(pl.lit(-10.0))
         .otherwise(pl.col("ti_allowance_psf")),
+        # Anchored to OBS_END — the portfolio's "today" — not the wall clock.
+        # date.today() here made the generated portfolio drift with the calendar,
+        # which broke the one-seed-one-portfolio guarantee and moved the
+        # time-split training metrics from run to run. Still comfortably in the
+        # future relative to the observation window, so the DQ trap holds.
         signed_date=pl.when(pl.col("comp_id").is_in(manifest.comps_future_date))
-        .then(pl.lit(date.today() + timedelta(days=400)))
+        .then(pl.lit(OBS_END + timedelta(days=400)))
         .otherwise(pl.col("signed_date")),
     )
 
