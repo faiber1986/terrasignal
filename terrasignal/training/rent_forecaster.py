@@ -59,15 +59,25 @@ def train() -> int:
     x_train, y_train = matrix(train_df)
     x_test, y_test = matrix(test_df)
 
+    # Sample weights of 1/y make the pinball loss *relative*: weighted absolute
+    # error is exactly MAPE, which is the metric the governed gate measures.
+    # Unweighted, the model minimised absolute error while being judged on
+    # relative error, so it optimised the wrong thing and lost to Ridge by a
+    # margin it did not need to. Hyperparameters below were selected on a
+    # time-based validation split carved out of the training window; the test
+    # window was never used for selection.
+    sample_weight = 1.0 / y_train
+
     models: dict[str, xgb.XGBRegressor] = {}
     preds: dict[str, np.ndarray] = {}
     for q in QUANTILES:
         m = xgb.XGBRegressor(
             objective="reg:quantileerror", quantile_alpha=q,
-            n_estimators=500, max_depth=5, learning_rate=0.05, subsample=0.9,
-            colsample_bytree=0.8, min_child_weight=4, random_state=17, n_jobs=4,
+            n_estimators=700, max_depth=5, learning_rate=0.08, subsample=0.9,
+            colsample_bytree=0.8, min_child_weight=2.0, reg_lambda=2.0,
+            random_state=17, n_jobs=4,
         )
-        m.fit(x_train, y_train)
+        m.fit(x_train, y_train, sample_weight=sample_weight)
         key = f"p{int(q * 100)}"
         models[key] = m
         preds[key] = m.predict(x_test)
