@@ -32,6 +32,20 @@ class Settings(BaseSettings):
     jwt_secret: str = "local-demo-secret-do-not-use-in-prod"
     rationale_backend: str = "template"  # template | bedrock
 
+    # CORS. The local Next.js dev server is always allowed via the regex below
+    # (it hops ports when one is busy). Deployed frontends are opt-in: set
+    # TERRASIGNAL_CORS_ALLOWED_ORIGINS to a comma-separated exact allowlist, e.g.
+    # "https://terrasignal.vercel.app,https://terrasignal-git-main-acme.vercel.app".
+    # Vercel mints a new hostname per preview deploy; to cover them set
+    # TERRASIGNAL_CORS_ALLOW_ORIGIN_REGEX rather than widening the allowlist to "*"
+    # (a wildcard is rejected by browsers when credentials are enabled).
+    cors_allowed_origins: str = ""
+    cors_allow_origin_regex: str = r"http://(localhost|127\.0\.0\.1):\d+"
+
+    def cors_origin_list(self) -> list[str]:
+        """Exact-match CORS origins, parsed from the comma-separated env var."""
+        return [o.strip().rstrip("/") for o in self.cors_allowed_origins.split(",") if o.strip()]
+
 
 @lru_cache(maxsize=1)
 def get_settings() -> Settings:

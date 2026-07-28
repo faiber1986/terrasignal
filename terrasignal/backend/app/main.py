@@ -27,15 +27,21 @@ from terrasignal.backend.app.routers import (
     portfolio,
     risk,
 )
+from terrasignal.settings import get_settings
 
 log = structlog.get_logger(__name__)
 
 API_PREFIX = "/api/v1"
 
-# Local Next.js dev server. Any localhost port is allowed (the dev server hops
-# ports when one is busy); production swaps this for an exact allowlist. Auth is
-# a bearer header, not a cookie, but we keep credentials on for parity (§8).
-ALLOWED_ORIGIN_REGEX = r"http://(localhost|127\.0\.0\.1):\d+"
+# CORS origins are configuration, not code: the local Next.js dev server matches
+# the default regex (it hops ports when one is busy), and deployed frontends are
+# added through TERRASIGNAL_CORS_ALLOWED_ORIGINS / _ALLOW_ORIGIN_REGEX so a new
+# environment never needs a code change. Auth is a bearer header, not a cookie,
+# but we keep credentials on for parity (§8) — which also means "*" is not a
+# usable value here, so the allowlist stays explicit.
+_settings = get_settings()
+ALLOWED_ORIGINS = _settings.cors_origin_list()
+ALLOWED_ORIGIN_REGEX = _settings.cors_allow_origin_regex
 
 
 @asynccontextmanager
@@ -59,6 +65,7 @@ app = FastAPI(
 
 app.add_middleware(
     CORSMiddleware,
+    allow_origins=ALLOWED_ORIGINS,
     allow_origin_regex=ALLOWED_ORIGIN_REGEX,
     allow_credentials=True,
     allow_methods=["*"],

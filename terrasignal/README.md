@@ -30,8 +30,9 @@ TerraSignal is an end-to-end machine-learning platform for commercial real estat
    - [Governance Console](#governance-console)
 6. [Data Pipeline Explained](#data-pipeline-explained)
 7. [Governance Features](#governance-features)
-8. [Troubleshooting](#troubleshooting)
-9. [Project Layout](#project-layout)
+8. [Deployment (frontend on Vercel, backend on a PaaS)](#deployment-frontend-on-vercel-backend-on-a-paas)
+9. [Troubleshooting](#troubleshooting)
+10. [Project Layout](#project-layout)
 
 ---
 
@@ -515,7 +516,64 @@ Every prediction row stores the model version that produced it. The model regist
 
 ---
 
+## Deployment (frontend on Vercel, backend on a PaaS)
+
+The two halves deploy independently and are wired together by exactly two settings. Get these wrong and the UI loads but every request fails — see the checklist below before debugging anything else.
+
+### 1. Backend — allow the frontend's origin
+
+CORS defaults to local development only. Add the deployed frontend origin to the backend's environment and restart it:
+
+```bash
+TERRASIGNAL_CORS_ALLOWED_ORIGINS=https://your-app.vercel.app
+```
+
+Comma-separate multiple origins. Vercel mints a **new hostname for every preview deploy**; to cover them without widening the allowlist, set a regex instead of listing each one:
+
+```bash
+TERRASIGNAL_CORS_ALLOW_ORIGIN_REGEX=https://your-app-[a-z0-9-]+\.vercel\.app|http://(localhost|127\.0\.0\.1):\d+
+```
+
+Note that overriding the regex **replaces** the localhost default — include it if you still want local dev to reach the deployed backend. `*` is not a usable value: the API sends `allow_credentials=True`, and browsers reject a wildcard in that case.
+
+### 2. Frontend — point at the backend
+
+In Vercel: **Settings → Environment Variables**
+
+| Variable | Value |
+|----------|-------|
+| `NEXT_PUBLIC_API_BASE` | `https://your-backend-host` |
+
+Origin only — no trailing slash, no `/api/v1` (the client appends it, and strips both if present anyway).
+
+**`NEXT_PUBLIC_*` is inlined at build time, not read at runtime.** Setting the variable does nothing until you trigger a new deploy. This is the single most common cause of "I set the URL and it still points at localhost".
+
+Also set **Root Directory** to `terrasignal/frontend` in Vercel's project settings. The repository root is a Python monorepo with no `package.json`, so framework detection fails without this.
+
+### 3. Deployment checklist
+
+- [ ] Backend reachable over **HTTPS** — a Vercel page cannot call an `http://` API (mixed content is blocked by the browser, and the client surfaces this as an explicit error).
+- [ ] `TERRASIGNAL_CORS_ALLOWED_ORIGINS` contains the exact Vercel origin, scheme included, no trailing slash.
+- [ ] `NEXT_PUBLIC_API_BASE` set **and** redeployed afterwards.
+- [ ] Vercel Root Directory = `terrasignal/frontend`.
+- [ ] `TERRASIGNAL_JWT_SECRET` rotated off the demo default (see Limitations).
+- [ ] Backend has a database and an approved model, or the UI logs in and then shows empty views.
+
+---
+
 ## Troubleshooting
+
+### Deployed UI shows "Could not reach the API" or "NEXT_PUBLIC_API_BASE is not set"
+
+These are the API client's own messages, not browser errors, and each names its fix — the client checks for the known deployment misconfigurations up front because the browser reports all of them as an indistinguishable `Failed to fetch`. Work through the deployment checklist above. To confirm which side is at fault, call the backend directly:
+
+```bash
+curl -i -X OPTIONS https://your-backend-host/api/v1/auth/login \
+  -H "Origin: https://your-app.vercel.app" \
+  -H "Access-Control-Request-Method: POST"
+```
+
+A `200` with an `access-control-allow-origin` header echoing your origin means CORS is correct and the problem is on the frontend side. A `400` with no such header means the origin is missing from `TERRASIGNAL_CORS_ALLOWED_ORIGINS`.
 
 ### "CORS error" or "Failed to fetch" on Windows
 
