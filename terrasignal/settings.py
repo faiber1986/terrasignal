@@ -9,6 +9,7 @@ from __future__ import annotations
 from functools import lru_cache
 from pathlib import Path
 from typing import Any
+from urllib.parse import urlsplit
 
 import yaml
 from pydantic_settings import BaseSettings, SettingsConfigDict
@@ -43,8 +44,24 @@ class Settings(BaseSettings):
     cors_allow_origin_regex: str = r"http://(localhost|127\.0\.0\.1):\d+"
 
     def cors_origin_list(self) -> list[str]:
-        """Exact-match CORS origins, parsed from the comma-separated env var."""
-        return [o.strip().rstrip("/") for o in self.cors_allowed_origins.split(",") if o.strip()]
+        """Exact-match CORS origins, parsed from the comma-separated env var.
+
+        Each entry is reduced to scheme://host[:port]. A browser's Origin header
+        never carries a path, so a pasted page URL ("https://app.vercel.app/login")
+        would otherwise never match — and the failure is invisible, because a
+        rejected preflight looks exactly like a backend that is down.
+        """
+        origins = []
+        for raw in self.cors_allowed_origins.split(","):
+            entry = raw.strip()
+            if not entry:
+                continue
+            parts = urlsplit(entry)
+            if parts.netloc:
+                origins.append(f"{parts.scheme}://{parts.netloc}")
+            else:
+                origins.append(entry.rstrip("/"))
+        return origins
 
 
 @lru_cache(maxsize=1)

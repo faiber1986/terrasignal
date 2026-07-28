@@ -134,6 +134,17 @@ def test_configured_deployment_origin_allowed(rebuilt_app: Callable[..., FastAPI
     assert _preflight(built, "http://localhost:3001") == "http://localhost:3001"
 
 
+def test_pasted_page_url_still_matches_origin(rebuilt_app: Callable[..., FastAPI]) -> None:
+    # Copying the URL out of the browser address bar yields a full page URL, and
+    # a browser's Origin header never carries the path. Configuration that only
+    # accepted a bare origin would reject the deployment it was meant to allow.
+    built = rebuilt_app(
+        TERRASIGNAL_CORS_ALLOWED_ORIGINS="https://terrasignal-mauve.vercel.app/login"
+    )
+    origin = "https://terrasignal-mauve.vercel.app"
+    assert _preflight(built, origin) == origin
+
+
 def test_origin_regex_covers_preview_deploys(rebuilt_app: Callable[..., FastAPI]) -> None:
     # Vercel mints a hostname per preview deploy; a regex covers them all.
     built = rebuilt_app(
