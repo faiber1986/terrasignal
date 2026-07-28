@@ -198,10 +198,17 @@ Trains an XGBoost regressor predicting market rent at renewal. Reports MAPE on a
 Models start in `PendingManualApproval` status. Approve them for serving:
 
 ```bash
-uv run python -m terrasignal.training.registry
+uv run python -m terrasignal.training approve --model terrasignal-risk-scorer   --approver demo.approver
+uv run python -m terrasignal.training approve --model terrasignal-rent-forecaster --approver demo.approver
 ```
 
-This promotes the latest version of each model to `Approved` status in `model_registry`.
+This promotes the latest pending version of each model to `Approved` status in
+`model_registry` and writes a `model.approved` audit event.
+
+> `python -m terrasignal.training.registry` does **not** work: `registry.py` has
+> no `__main__` block, so it imports and exits 0 without approving anything. The
+> failure only surfaces two steps later, as
+> `RuntimeError: no approved risk scorer; approve a version first`.
 
 #### 4f. Run batch scoring
 

@@ -63,8 +63,13 @@ if [ "$NEEDS_SEED" = "yes" ]; then
   python -m terrasignal.training.risk_scorer
   log "  5/7 training the renewal rent forecaster"
   python -m terrasignal.training.rent_forecaster
+  # `python -m terrasignal.training.registry` (as the README used to say) is a
+  # no-op: registry.py has no __main__, so it imports and exits 0 without
+  # approving anything, and batch_score then dies on "no approved risk scorer".
+  # The real entry point is the training CLI's `approve` subcommand.
   log "  6/7 approving both models for serving"
-  python -m terrasignal.training.registry
+  python -m terrasignal.training approve --model terrasignal-risk-scorer --approver ci.bootstrap
+  python -m terrasignal.training approve --model terrasignal-rent-forecaster --approver ci.bootstrap
   log "  7/7 batch scoring + drift baseline"
   python -m terrasignal.training.batch_score
   python -m terrasignal.training.drift || log "WARNING: drift step failed; continuing."
